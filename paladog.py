@@ -14,8 +14,6 @@ Castle = load_image("image/castle02.png")
 floor = load_image('image/tile.png')
 ladder = load_image('image/ladder2.png')
 
-
-
 class Character:
     state = 0
     frame = 0
@@ -33,7 +31,8 @@ class main_Character(Character):
     climb_size = (376, 262)
     hit_size = (647, 504)
     box = []
-    dir = 0
+    dir_x = 0
+    dir_y = 0
     def __init__(self):
         self.m_x = 100
         self.m_y = 90
@@ -48,7 +47,7 @@ class main_Character(Character):
         elif self.state == 3:
             self.frame = (self.frame + 1) % 12
             if(self.frame == 0):
-                if self.dir == 0:
+                if self.dir_x == 0:
                     self.state = 0
                 else:
                     self.state = 1
@@ -75,48 +74,90 @@ class main_Character(Character):
             self.main_climb()
         elif self.state == 3:
             self.main_hit()
+
+    def change_state(self, num):
+        if num == 0:
+            self.state = 0
+        elif num == 1:
+            self.state = 1
+        elif num == 2:
+            self.state = 2
+        elif num == 3:
+            self.state = 3
     def move_charcter(self):
         if self.state == 1 or self.state == 0:
-            self.m_x += self.dir * 5
+            self.m_x += self.dir_x * 5
             self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0] // 6, self.m_y + self.idle_size[1] // 3]
+        elif self.state == 2:
+            self.m_y += self.dir_y * 5
+            if self.m_y > 300:
+                self.m_y = 300
+                self.state = 0
+                self.dir_y = 0
+            elif self.m_y < 90:
+                self.state = 0
+                self.m_y = 90
+                self.dir_y = 0
+
     def catch_event(self):
         if self.state == 3:
             return
         events = get_events()
         for event in events:
             if event.type == SDL_KEYDOWN:
-                if event.key == SDLK_RIGHT:
-                    self.state = 1
-                    self.dir += 1
-                    if self.dir == 0:
-                        self.state = 0
-                elif event.key == SDLK_LEFT:
-                    self.state = 1
-                    self.dir -= 1
-                    if self.dir == 0:
-                        self.state = 0
-                elif event.key == SDLK_UP:
-                    if self.box[0] > 300 - 50 and self.box[2] < 300 + 70:
+                if event.key == SDLK_UP:
+                    if (self.box[0] > 300 - 50 and self.box[2] < 300 + 70) and self.m_y == 90:
                         self.state = 2
-                elif event.key == SDLK_SPACE:
+                        self.m_x = 280
+                        self.m_y += 5
+                        self.dir_y += 1
+                    elif self.state == 2:
+                        self.dir_y += 1
+                if event.key == SDLK_DOWN:
+                    if (self.box[0] > 300 - 50 and self.box[2] < 300 + 70) and self.m_y == 300:
+                        self.state = 2
+                        self.m_x = 280
+                        self.m_y -= 5
+                        self.dir_y -= 1
+                    elif self.state == 2:
+                        self.dir_y -= 1
+                if event.key == SDLK_RIGHT:
+                    if self.state != 2:
+                        self.state = 1
+                    self.dir_x += 1
+                    if self.dir_x == 0 and self.state != 2:
+                        self.state = 0
+                if event.key == SDLK_LEFT:
+                    if self.state != 2:
+                        self.state = 1
+                    self.dir_x -= 1
+                    if self.dir_x == 0 and self.state != 2:
+                        self.state = 0
+                if event.key == SDLK_SPACE:
                     self.frame = 0
                     self.state = 3
             elif event.type == SDL_KEYUP:
+                if event.key == SDLK_UP:
+                    if self.state == 2:
+                        self.dir_y -= 1
+                if event.key == SDLK_DOWN:
+                    if self.state == 2:
+                        self.dir_y += 1
                 if event.key == SDLK_RIGHT:
-                    self.dir -= 1
-                    if self.dir == 0:
+                    self.dir_x -= 1
+                    if self.dir_x == 0 and self.state != 2:
                         self.state = 0
-                    else:
+                    elif self.state != 2:
                         self.state = 1
-                elif event.key == SDLK_LEFT:
-                    self.dir += 1
-                    if self.dir == 0:
+                if event.key == SDLK_LEFT:
+                    self.dir_x += 1
+                    if self.dir_x == 0 and self.state != 2:
                         self.state = 0
-                    else:
+                    elif self.state != 2:
                         self.state = 1
 
 def draw_backGround():
-    global ladder_posx,ladder_posy
+    global ladder_posx, ladder_posy
     ladder_posx = (300, 800)
     ladder_posy = 160
     backGround.draw(width // 2, height // 2)
@@ -126,8 +167,6 @@ def draw_backGround():
         x = x + tile_width
     ladder.draw(ladder_posx[0], ladder_posy)
     ladder.draw(ladder_posx[1], ladder_posy)
-
-
 
 
 a = main_Character()
@@ -141,7 +180,7 @@ while True:
     a.frame_rate()
     a.move_charcter()
     update_canvas()
-    delay(0.05)
+    delay(1/60)
 
 #Grass.draw(width // 2, height//2 - 50)
 
