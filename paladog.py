@@ -9,7 +9,6 @@ open_canvas(width, height)
 
 backGround = load_image('image/Bground.png')
 Grass = load_image('image/Grass.png')
-Mouse = load_image('image/mouse_move.png')
 floor = load_image('image/tile.png')
 ladder = load_image('image/ladder2.png')
 
@@ -18,27 +17,31 @@ main_run = load_image('image/main_run.png')
 main_hit = load_image('image/main_hit.png')
 main_cilmb = load_image('image/main_climb.png')
 
+warrior_run = load_image('image/warrior_run.png')
+warrior_hit = load_image('image/warrior_hit.png')
+
+
 class Character:
-    state = 0
-    frame = 0
-    m_x = 0
-    m_y = 0
-    attack_damage = 0
+    def __init__(self, i_x=0, i_y=0, i_attack=0):
+        self.state = 0
+        self.frame = 0
+        self.m_x = i_x
+        self.m_y = i_y
+        self.dir_x = 0
+        self.attack_damage = i_attack
 
 
-#1층에서 120
-class main_Character(Character):
-    idle_size = (373, 286)
-    run_size = (428, 331)
-    climb_size = (376, 262)
-    hit_size = (647, 504)
-    box = []
-    dir_x = 0
-    dir_y = 0
-    look_at = 1
+class MainCharacter(Character):
     def __init__(self):
-        self.m_x = 100
-        self.m_y = 90
+        super().__init__(100, 90, 10)
+        self.idle_size = (373, 286)
+        self.run_size = (428, 331)
+        self.climb_size = (376, 262)
+        self.hit_size = (647, 504)
+        self.box = []
+        self.dir_x = 0
+        self.dir_y = 0
+        self.look_at = 1
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
 
     def frame_rate(self):
@@ -50,17 +53,20 @@ class main_Character(Character):
             self.frame = (self.frame + 1) % 8
         elif self.state == 3:
             self.frame = (self.frame + 1) % 12
-            if(self.frame == 0):
+            if self.frame == 0:
                 if self.dir_x == 0:
                     self.state = 0
                 else:
                     self.state = 1
+
     def idle(self):
         main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1], self.m_x, self.m_y,
                             self.idle_size[0] // 3, self.idle_size[1] // 3)
+
     def flip_idle(self):
         main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1], 0, 'h',
                                       self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
+
     def run(self):
         main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
                            self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
@@ -68,12 +74,15 @@ class main_Character(Character):
     def flip_run(self):
         main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],  0, 'h',
                                      self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
+
     def climb(self):
         main_cilmb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1], self.m_x, self.m_y,
                            self.climb_size[0] // 3, self.climb_size[1] // 3)
+
     def hit(self):  # y, 120
         main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1], self.m_x, self.m_y + 20,
                            self.hit_size[0] // 3, self.hit_size[1] // 3)
+
     def flip_hit(self):  # y, 120
         main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1], 0, 'h',
                                      self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
@@ -93,6 +102,7 @@ class main_Character(Character):
             self.hit()
         elif self.state == 3 and self.look_at == -1:
             self.flip_hit()
+
     def change_state(self, num):
         if num == 0:
             self.state = 0
@@ -102,6 +112,7 @@ class main_Character(Character):
             self.state = 2
         elif num == 3:
             self.state = 3
+
     def move(self):
         if self.state == 1 or self.state == 0:
             self.m_x += self.dir_x * 5
@@ -206,27 +217,42 @@ class main_Character(Character):
         elif self.dir_x < 0:
             self.look_at = -1
 
-class friendly_Character(Character):
-    def __init__(self):
-        self.move_size = (87, 80)
-        self.m_x = 90
-        self.m_y = 80
-        self.attack_damage = 5
-        self.health_point = 50
+
+class NonePlayableCharacter(Character):
+    def __init__(self, i_x=0, i_y=0, i_attack=0, i_health = 0):
+        super().__init__(i_x, i_y, i_attack)
+        self.health_point = i_health
         self.dir_x = 1
-        self.frame_mouse = 0
+        self.state = 1
+    pass
+
+
+class WarriorCharacter(NonePlayableCharacter):
+    def __init__(self):
+        super().__init__(90, 110, 5, 50)
+        # self.move_size = (87, 80)
+        self.run_size = (131, 158)
+        self.hit_size = (198, 175)
+        self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
+
     def frame_rate(self):
-        self.frame_mouse += 1
-        if self.frame_mouse % 8 == 0:
-            self.frame = (self.frame + 1) % 3
+        self.frame = (self.frame + 1) % 16
+        if self.frame == 0:
+            self.state *= -1
+
+    def hit(self):
+        warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1], 0, 'h',
+                                        self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1]) # +17, +15스프라이트 오차 수정
 
     def run(self):
-        Mouse.clip_draw(87 * self.frame, 0, self.move_size[0], self.move_size[1], self.m_x, self.m_y)
+        warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1], 0, 'h',
+                                       self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+        # mouse_move.clip_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1], self.m_x, self.m_y)
 
     def move(self):
-        self.m_x += self.dir_x * 1
-        if self.m_x > 1240:
-            self.m_x = 1240
+        self.m_x += self.dir_x * 5
+        if self.m_x > 1200:
+            self.m_x = 1200
 
 class enemy_Character(Character):
     dir_x = -1
@@ -257,23 +283,34 @@ def draw_backGround():
     ladder.draw(ladder_posx[0], ladder_posy)
     ladder.draw(ladder_posx[1], ladder_posy)
 
-user = main_Character()
-mouse01 = friendly_Character()
+user = MainCharacter()
+mouse01 = WarriorCharacter()
 castle = Castle()
 
-while True:
-    clear_canvas()
-    draw_backGround()
+def user_ ():
     user.catch_event()
     user.frame_state()
     user.frame_rate()
     user.move()
 
-    mouse01.run()
+
+
+while True:
+    clear_canvas()
+    draw_backGround()
+
+    if mouse01.state == 1:
+        mouse01.run()
+    else:
+        mouse01.hit()
     mouse01.frame_rate()
-    mouse01.move()
+    #mouse01.move()
+
+    user_()
+
+
     update_canvas()
-    delay(1/60)
+    delay(0.1)
 
 
 
