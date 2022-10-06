@@ -7,19 +7,33 @@ tile_width = 90
 
 open_canvas(width, height)
 
-backGround = load_image('image/Bground.png')
-Grass = load_image('image/Grass.png')
-floor = load_image('image/tile.png')
-ladder = load_image('image/ladder.png')
 
-main_idle = load_image('image/main_idle.png')
-main_run = load_image('image/main_run.png')
-main_hit = load_image('image/main_hit.png')
-main_cilmb = load_image('image/main_climb.png')
+class BackGround:
+    def __init__(self):
+        self.backGround = load_image('image/Bground.png')
 
-warrior_idle = load_image('image/warrior_idle.png')
-warrior_run = load_image('image/warrior_run.png')
-warrior_hit = load_image('image/warrior_hit.png')
+    def draw(self):
+        self.backGround.draw(width // 2, height // 2)
+
+
+class Floor:
+    def __init__(self):
+        self.floor = load_image('image/tile.png')
+
+    def draw(self):
+        for x in range(98, width, tile_width):
+            self.floor.draw(x, 245)
+            x = x + tile_width
+
+
+class Ladder:
+    def __init__(self):
+        self.ladder = load_image('image/ladder.png')
+        self.mx = (300, 800)
+
+    def draw(self):
+        self.ladder.draw(self.mx[0], 160)
+        self.ladder.draw(self.mx[1], 160)
 
 
 class Character:
@@ -33,6 +47,11 @@ class Character:
 
 
 class MainCharacter(Character):
+    main_idle = load_image('image/main_idle.png')
+    main_run = load_image('image/main_run.png')
+    main_hit = load_image('image/main_hit.png')
+    main_cilmb = load_image('image/main_climb.png')
+
     def __init__(self):
         super().__init__(100, 90, 10)
         self.idle_size = (373, 286)
@@ -46,32 +65,32 @@ class MainCharacter(Character):
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
 
     def idle(self):
-        main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1], self.m_x, self.m_y,
-                            self.idle_size[0] // 3, self.idle_size[1] // 3)
+        self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
+                                 self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
 
     def flip_idle(self):
-        main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1], 0, 'h',
-                                      self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
+        self.main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
+                                           0, 'h', self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
 
     def run(self):
-        main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
-                           self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
+        self.main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
+                                self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
 
     def flip_run(self):
-        main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],  0, 'h',
-                                     self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
+        self.main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
+                                          0, 'h', self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
 
     def climb(self):
-        main_cilmb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
-                             self.m_x, self.m_y, self.climb_size[0] // 3, self.climb_size[1] // 3)
+        self.main_cilmb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
+                                  self.m_x, self.m_y, self.climb_size[0] // 3, self.climb_size[1] // 3)
 
     def hit(self):  # y, 120
-        main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
-                           self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
+        self.main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
+                                self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
 
     def flip_hit(self):  # y, 120
-        main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1], 0, 'h',
-                                     self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
+        self.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
+                                          0, 'h', self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
 
     def frame_state(self):
         if self.state == 0 and self.look_at == 1:
@@ -235,6 +254,10 @@ class NonePlayableCharacter(Character):
 
 
 class WarriorCharacter(NonePlayableCharacter):
+    warrior_idle = load_image('image/warrior_idle.png')
+    warrior_run = load_image('image/warrior_run.png')
+    warrior_hit = load_image('image/warrior_hit.png')
+
     def __init__(self):
         super().__init__(90, 110, 5, 50)
         self.idle_size = (121, 106)
@@ -243,16 +266,16 @@ class WarriorCharacter(NonePlayableCharacter):
         self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
 
     def idle(self): # +35, -20 스프라이트 오차 수정
-        warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1], 0, 'h',
-                                        self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
+        self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
+                                              0, 'h', self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
 
     def hit(self): # +17, +15 스프라이트 오차 수정
-        warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1], 0, 'h',
-                                        self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
+        self.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
+                                             0, 'h', self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
 
     def run(self):
-        warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1], 0, 'h',
-                                       self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+        self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
+                                             0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
 
     def frame_state(self):
         if self.state == 0:
@@ -317,6 +340,7 @@ class WarriorCharacter(NonePlayableCharacter):
 class EnemyCharacter(Character):
     dir_x = -1
     health_point = 70
+
     def __init__(self):
         self.m_x = 1200
         self.m_y = 80
@@ -324,26 +348,15 @@ class EnemyCharacter(Character):
 
 
 class Castle:
+    Castle_img = load_image("image/castle.png")
+
     def __init__(self):
         self.m_x = 0
         self.m_y = 245
         self.health_point = 1000
-        self.Castle_img = load_image("image/castle.png")
 
-    def draw_castle(self):
+    def draw(self):
         self.Castle_img.draw(self.m_x, self.m_y)
-
-
-def draw_back_ground():
-    ladder_pos_x = (300, 800)
-    ladder_pos_y = 160
-    backGround.draw(width // 2, height // 2)
-    castle.draw_castle()
-    for x in range(98, width, tile_width):
-        floor.draw(x, 245)
-        x = x + tile_width
-    ladder.draw(ladder_pos_x[0], ladder_pos_y)
-    ladder.draw(ladder_pos_x[1], ladder_pos_y)
 
 
 hero = MainCharacter()
@@ -366,11 +379,22 @@ def friendly_event(i_warrior):
 
 
 def reset_world():
+    global back_ground
+    global ladder
+    global floor
+    back_ground = BackGround()
+    ladder = Ladder()
+    floor = Floor()
+
     pass
 
 
 def update_world():
-    draw_back_ground()
+    back_ground.draw()
+    castle.draw()
+    floor.draw()
+    ladder.draw()
+
     friendly_event(warrior)
     user_event(hero)
     pass
@@ -387,6 +411,9 @@ def update_world():
 #                 self.gameRun = False
 #
 # user = UserClass()
+
+
+reset_world()
 
 while True:
     clear_canvas()
