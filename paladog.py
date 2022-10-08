@@ -50,7 +50,7 @@ class MainCharacter(Character):
     main_idle = load_image('image/main_idle.png')
     main_run = load_image('image/main_run.png')
     main_hit = load_image('image/main_hit.png')
-    main_cilmb = load_image('image/main_climb.png')
+    main_climb = load_image('image/main_climb.png')
 
     def __init__(self):
         super().__init__(100, 90, 10)
@@ -63,6 +63,7 @@ class MainCharacter(Character):
         self.dir_y = 0
         self.look_at = 1
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
+        self.resource = 100
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
@@ -81,7 +82,7 @@ class MainCharacter(Character):
                                           0, 'h', self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
 
     def climb(self):
-        self.main_cilmb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
+        self.main_climb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
                                   self.m_x, self.m_y, self.climb_size[0] // 3, self.climb_size[1] // 3)
 
     def hit(self):  # y, 120
@@ -92,7 +93,7 @@ class MainCharacter(Character):
         self.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
                                           0, 'h', self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
 
-    def frame_state(self):
+    def draw(self):
         if self.state == 0 and self.look_at == 1:
             self.idle()
         elif self.state == 0 and self.look_at == -1:
@@ -171,76 +172,80 @@ class MainCharacter(Character):
             if self.look_at == -1:
                 self.m_x += 35  # flip x좌표 이미지 보정
 
-    def catch_event(self):
-        if self.state == 3:
-            return
-        events = get_events()
-        for event in events:
-            if event.type == SDL_KEYDOWN:
-                if event.key == SDLK_UP:
-                    if (self.box[0] > 300 - 70 and self.box[2] < 300 + 70) and self.m_y == 90:
-                        self.state = 2
-                        self.m_x = 280
-                        self.m_y += 5
-                        self.dir_y += 1
-                    elif (self.box[0] > 800 - 70 and self.box[2] < 800 + 70) and self.m_y == 90:
-                        self.state = 2
-                        self.m_x = 780
-                        self.m_y += 5
-                        self.dir_y += 1
-                    elif self.state == 2:
-                        self.dir_y += 1
-                elif event.key == SDLK_DOWN:
-                    if (self.box[0] > 300 - 70 and self.box[2] < 300 + 70) and self.m_y == 300:
-                        self.state = 2
-                        self.m_x = 280
-                        self.m_y -= 5
-                        self.dir_y -= 1
-                    elif (self.box[0] > 800 - 70 and self.box[2] < 800 + 70) and self.m_y == 300:
-                        self.state = 2
-                        self.m_x = 780
-                        self.m_y -= 5
-                        self.dir_y -= 1
-                    elif self.state == 2:
-                        self.dir_y -= 1
-                elif event.key == SDLK_RIGHT:
-                    if self.state != 2:
-                        self.state = 1
-                    self.dir_x += 1
-                    if self.dir_x == 0 and self.state != 2:
-                        self.state = 0
-                elif event.key == SDLK_LEFT:
-                    if self.state != 2:
-                        self.state = 1
-                    self.dir_x -= 1
-                    if self.dir_x == 0 and self.state != 2:
-                        self.state = 0
-                elif event.key == SDLK_SPACE and self.state != 2:
-                    self.frame = 0
-                    self.state = 3
-            elif event.type == SDL_KEYUP:
-                if event.key == SDLK_UP:
-                    if self.state == 2:
-                        self.dir_y -= 1
-                elif event.key == SDLK_DOWN:
-                    if self.state == 2:
-                        self.dir_y += 1
-                elif event.key == SDLK_RIGHT:
-                    self.dir_x -= 1
-                    if self.dir_x == 0 and self.state != 2:
-                        self.state = 0
-                    elif self.state != 2:
-                        self.state = 1
-                elif event.key == SDLK_LEFT:
-                    self.dir_x += 1
-                    if self.dir_x == 0 and self.state != 2:
-                        self.state = 0
-                    elif self.state != 2:
-                        self.state = 1
-        if self.dir_x > 0:
-            self.look_at = 1
-        elif self.dir_x < 0:
-            self.look_at = -1
+    def get_resource(self):
+        if self.resource < 100:
+            self.resource += 1
+
+    # def catch_event(self):
+    #     if self.state == 3:
+    #         return
+    #     events = get_events()
+    #     for event in events:
+    #         if event.type == SDL_KEYDOWN:
+    #             if event.key == SDLK_UP:
+    #                 if (self.box[0] > 300 - 70 and self.box[2] < 300 + 70) and self.m_y == 90:
+    #                     self.state = 2
+    #                     self.m_x = 280
+    #                     self.m_y += 5
+    #                     self.dir_y += 1
+    #                 elif (self.box[0] > 800 - 70 and self.box[2] < 800 + 70) and self.m_y == 90:
+    #                     self.state = 2
+    #                     self.m_x = 780
+    #                     self.m_y += 5
+    #                     self.dir_y += 1
+    #                 elif self.state == 2:
+    #                     self.dir_y += 1
+    #             elif event.key == SDLK_DOWN:
+    #                 if (self.box[0] > 300 - 70 and self.box[2] < 300 + 70) and self.m_y == 300:
+    #                     self.state = 2
+    #                     self.m_x = 280
+    #                     self.m_y -= 5
+    #                     self.dir_y -= 1
+    #                 elif (self.box[0] > 800 - 70 and self.box[2] < 800 + 70) and self.m_y == 300:
+    #                     self.state = 2
+    #                     self.m_x = 780
+    #                     self.m_y -= 5
+    #                     self.dir_y -= 1
+    #                 elif self.state == 2:
+    #                     self.dir_y -= 1
+    #             elif event.key == SDLK_RIGHT:
+    #                 if self.state != 2:
+    #                     self.state = 1
+    #                 self.dir_x += 1
+    #                 if self.dir_x == 0 and self.state != 2:
+    #                     self.state = 0
+    #             elif event.key == SDLK_LEFT:
+    #                 if self.state != 2:
+    #                     self.state = 1
+    #                 self.dir_x -= 1
+    #                 if self.dir_x == 0 and self.state != 2:
+    #                     self.state = 0
+    #             elif event.key == SDLK_SPACE and self.state != 2:
+    #                 self.frame = 0
+    #                 self.state = 3
+    #         elif event.type == SDL_KEYUP:
+    #             if event.key == SDLK_UP:
+    #                 if self.state == 2:
+    #                     self.dir_y -= 1
+    #             elif event.key == SDLK_DOWN:
+    #                 if self.state == 2:
+    #                     self.dir_y += 1
+    #             elif event.key == SDLK_RIGHT:
+    #                 self.dir_x -= 1
+    #                 if self.dir_x == 0 and self.state != 2:
+    #                     self.state = 0
+    #                 elif self.state != 2:
+    #                     self.state = 1
+    #             elif event.key == SDLK_LEFT:
+    #                 self.dir_x += 1
+    #                 if self.dir_x == 0 and self.state != 2:
+    #                     self.state = 0
+    #                 elif self.state != 2:
+    #                     self.state = 1
+    #     if self.dir_x > 0:
+    #         self.look_at = 1
+    #     elif self.dir_x < 0:
+    #         self.look_at = -1
 
 
 class NonePlayableCharacter(Character):
@@ -250,7 +255,6 @@ class NonePlayableCharacter(Character):
         self.dir_x = 1
         self.state = 1
         self.cool_time = 0
-    pass
 
 
 class WarriorCharacter(NonePlayableCharacter):
@@ -258,8 +262,12 @@ class WarriorCharacter(NonePlayableCharacter):
     warrior_run = load_image('image/warrior_run.png')
     warrior_hit = load_image('image/warrior_hit.png')
 
-    def __init__(self):
-        super().__init__(90, 110, 5, 50)
+    def __init__(self, i_key):
+        # 1층 115  2층 325
+        if i_key == 1:
+            super().__init__(90, 115, 5, 50)
+        elif i_key == 5:
+            super().__init__(90, 325, 5, 50)
         self.idle_size = (121, 106)
         self.run_size = (131, 158)
         self.hit_size = (198, 175)
@@ -277,7 +285,7 @@ class WarriorCharacter(NonePlayableCharacter):
         self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
                                              0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
 
-    def frame_state(self):
+    def draw(self):
         if self.state == 0:
             self.idle()
         elif self.state == 1:
@@ -337,14 +345,15 @@ class WarriorCharacter(NonePlayableCharacter):
         else:
             self.state = 0
 
-class EnemyCharacter(Character):
-    dir_x = -1
-    health_point = 70
 
-    def __init__(self):
-        self.m_x = 1200
-        self.m_y = 80
-        self.attack_damage = 10
+# class EnemyCharacter(Character):
+#     dir_x = -1
+#     health_point = 70
+#
+#     def __init__(self):
+#         self.m_x = 1200
+#         self.m_y = 80
+#         self.attack_damage = 10
 
 
 class Castle:
@@ -359,21 +368,16 @@ class Castle:
         self.Castle_img.draw(self.m_x, self.m_y)
 
 
-hero = MainCharacter()
-warrior = WarriorCharacter()
-castle = Castle()
-
-
 def user_event(i_hero):
-    i_hero.catch_event()
-    i_hero.frame_state()
+    i_hero.draw()
     i_hero.frame_rate()
     i_hero.move()
+    i_hero.get_resource()
 
 
 def friendly_event(i_warrior):
     i_warrior.hit_cool_time()
-    i_warrior.frame_state()
+    i_warrior.draw()
     i_warrior.frame_rate()
     i_warrior.move()
 
@@ -386,8 +390,6 @@ def reset_world():
     ladder = Ladder()
     floor = Floor()
 
-    pass
-
 
 def update_world():
     back_ground.draw()
@@ -395,27 +397,103 @@ def update_world():
     floor.draw()
     ladder.draw()
 
-    friendly_event(warrior)
-    user_event(hero)
-    pass
+    for w in warrior:
+        friendly_event(w)
+    user_event(user.player)
+    user.catch_events()
 
-# class UserClass:
-#     def __init__(self):
-#         self.player = MainCharacter()
-#         self.gameRun = True
-#
-#     def catch_events(self):
-#         events = get_events()
-#         for event in events:
-#             if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-#                 self.gameRun = False
-#
-# user = UserClass()
+class UserClass:
+    def __init__(self):
+        self.player = MainCharacter()
+        self.gameRun = True
 
+    def catch_events(self):
+        global warrior
+        events = get_events()
+        for event in events:
+            if event.type == SDL_KEYDOWN:
+                if event.key == SDLK_ESCAPE:
+                    self.gameRun = False
+                elif event.key == SDLK_UP:
+                    if (self.player.box[0] > 300 - 70 and self.player.box[2] < 300 + 70) and self.player.m_y == 90:
+                        self.player.state = 2
+                        self.player.m_x = 280
+                        self.player.m_y += 5
+                        self.player.dir_y += 1
+                    elif (self.player.box[0] > 800 - 70 and self.player.box[2] < 800 + 70) and self.player.m_y == 90:
+                        self.player.state = 2
+                        self.player.m_x = 780
+                        self.player.m_y += 5
+                        self.player.dir_y += 1
+                    elif self.player.state == 2:
+                        self.player.dir_y += 1
+                elif event.key == SDLK_DOWN:
+                    if (self.player.box[0] > 300 - 70 and self.player.box[2] < 300 + 70) and self.player.m_y == 300:
+                        self.player.state = 2
+                        self.player.m_x = 280
+                        self.player.m_y -= 5
+                        self.player.dir_y -= 1
+                    elif (self.player.box[0] > 800 - 70 and self.player.box[2] < 800 + 70) and self.player.m_y == 300:
+                        self.player.state = 2
+                        self.player.m_x = 780
+                        self.player.m_y -= 5
+                        self.player.dir_y -= 1
+                    elif self.player.state == 2:
+                        self.player.dir_y -= 1
+                elif event.key == SDLK_RIGHT:
+                    if self.player.state != 2:
+                        self.player.state = 1
+                    self.player.dir_x += 1
+                    if self.player.dir_x == 0 and self.player.state != 2:
+                        self.player.state = 0
+                elif event.key == SDLK_LEFT:
+                    if self.player.state != 2:
+                        self.player.state = 1
+                    self.player.dir_x -= 1
+                    if self.player.dir_x == 0 and self.player.state != 2:
+                        self.player.state = 0
+                elif event.key == SDLK_SPACE and self.player.state != 2:
+                    self.player.frame = 0
+                    self.player.state = 3
+                elif event.key == SDLK_1 and self.player.resource >= 100:
+                    self.player.resource -= 100
+                    warrior.append(WarriorCharacter(1))
+                elif event.key == SDLK_5 and self.player.resource >= 100:
+                    self.player.resource -= 100
+                    warrior.append(WarriorCharacter(5))
+
+            elif event.type == SDL_KEYUP:
+                if event.key == SDLK_UP:
+                    if self.player.state == 2:
+                        self.player.dir_y -= 1
+                elif event.key == SDLK_DOWN:
+                    if self.player.state == 2:
+                        self.player.dir_y += 1
+                elif event.key == SDLK_RIGHT:
+                    self.player.dir_x -= 1
+                    if self.player.dir_x == 0 and self.player.state != 2:
+                        self.player.state = 0
+                    elif self.player.state != 2:
+                        self.player.state = 1
+                elif event.key == SDLK_LEFT:
+                    self.player.dir_x += 1
+                    if self.player.dir_x == 0 and self.player.state != 2:
+                        self.player.state = 0
+                    elif self.player.state != 2:
+                        self.player.state = 1
+
+            if self.player.dir_x > 0:
+                self.player.look_at = 1
+            elif self.player.dir_x < 0:
+                self.player.look_at = -1
+
+user = UserClass()
+warrior = []
+castle = Castle()
 
 reset_world()
-
-while True:
+time = 0
+while user.gameRun:
     clear_canvas()
     update_world()
     update_canvas()
