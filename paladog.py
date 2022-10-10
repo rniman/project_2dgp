@@ -66,31 +66,31 @@ class MainCharacter(Character):
         self.resource = 100
 
     def idle(self):
-        self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
+        MainCharacter.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
                                  self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
 
     def flip_idle(self):
-        self.main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
+        MainCharacter.main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
                                            0, 'h', self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
 
     def run(self):
-        self.main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
+        MainCharacter.main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
                                 self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
 
     def flip_run(self):
-        self.main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
+        MainCharacter.main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
                                           0, 'h', self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
 
     def climb(self):
-        self.main_climb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
+        MainCharacter.main_climb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
                                   self.m_x, self.m_y, self.climb_size[0] // 3, self.climb_size[1] // 3)
 
     def hit(self):  # y, 120
-        self.main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
+        MainCharacter.main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
                                 self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
 
     def flip_hit(self):  # y, 120
-        self.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
+        MainCharacter.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
                                           0, 'h', self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
 
     def draw(self):
@@ -261,6 +261,7 @@ class WarriorCharacter(NonePlayableCharacter):
     warrior_idle = load_image('image/warrior_idle.png')
     warrior_run = load_image('image/warrior_run.png')
     warrior_hit = load_image('image/warrior_hit.png')
+    warrior_death = load_image('image/warrior_death.png')
 
     def __init__(self, i_key):
         # 1층 115  2층 325
@@ -271,19 +272,24 @@ class WarriorCharacter(NonePlayableCharacter):
         self.idle_size = (121, 106)
         self.run_size = (131, 158)
         self.hit_size = (198, 175)
+        self.death_size = (187, 175)
         self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
 
     def idle(self): # +35, -20 스프라이트 오차 수정
-        self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
+        WarriorCharacter.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
                                               0, 'h', self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
 
     def hit(self): # +17, +15 스프라이트 오차 수정
-        self.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
+        WarriorCharacter.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
                                              0, 'h', self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
 
     def run(self):
-        self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
+        WarriorCharacter.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
                                              0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+
+    def death(self):
+        WarriorCharacter.warrior_death.clip_composite_draw(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
+                                             0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
 
     def draw(self):
         if self.state == 0:
@@ -292,6 +298,8 @@ class WarriorCharacter(NonePlayableCharacter):
             self.run()
         elif self.state == 2:
             self.hit()
+        elif self.state == -1:
+            self.death()
 
     def frame_rate(self):
         if self.state == 0:  # idle
@@ -311,6 +319,10 @@ class WarriorCharacter(NonePlayableCharacter):
             if self.frame == 0:
                 self.state = 0
                 self.cool_time = 100
+        elif self.state == -1:
+            self.frame = (self.frame + 1) % 16
+            if self.frame == 0:
+                self.delete_self()
 
     def hit_cool_time(self):
         if self.cool_time != 0:
@@ -345,6 +357,8 @@ class WarriorCharacter(NonePlayableCharacter):
         else:
             self.state = 0
 
+    def delete_self(self):
+        warrior.remove(self)
 
 # class EnemyCharacter(Character):
 #     dir_x = -1
@@ -365,7 +379,7 @@ class Castle:
         self.health_point = 1000
 
     def draw(self):
-        self.Castle_img.draw(self.m_x, self.m_y)
+        Castle.Castle_img.draw(self.m_x, self.m_y)
 
 
 def user_event(i_hero):
@@ -390,6 +404,10 @@ def reset_world():
     ladder = Ladder()
     floor = Floor()
 
+def del_world():
+    del back_ground
+    del ladder
+    del floor
 
 def update_world():
     back_ground.draw()
@@ -402,6 +420,9 @@ def update_world():
     user_event(user.player)
     user.catch_events()
 
+def delete_object(obj):
+    del obj
+
 class UserClass:
     def __init__(self):
         self.player = MainCharacter()
@@ -413,7 +434,9 @@ class UserClass:
         for event in events:
             if event.type == SDL_KEYDOWN:
                 if event.key == SDLK_ESCAPE:
-                    self.gameRun = False
+                    # self.gameRun = False
+                    for war in warrior:
+                        war.state = -1
                 elif event.key == SDLK_UP:
                     if (self.player.box[0] > 300 - 70 and self.player.box[2] < 300 + 70) and self.player.m_y == 90:
                         self.player.state = 2
@@ -487,16 +510,25 @@ class UserClass:
             elif self.player.dir_x < 0:
                 self.player.look_at = -1
 
+
+# init
 user = UserClass()
 warrior = []
 castle = Castle()
-
 reset_world()
 time = 0
+
+
+# game loop
 while user.gameRun:
     clear_canvas()
     update_world()
     update_canvas()
     delay(0.03)
 
+# delete
+del warrior
+del user
+del castle
+del_world()
 
