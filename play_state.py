@@ -25,6 +25,7 @@ class Floor:
     def __init__(self):
         self.floor = load_image('image/tile.png')
         self.tile_width = 90
+
     def draw(self):
         for x in range(98, width, self.tile_width):
             self.floor.draw(x, 245)
@@ -68,7 +69,6 @@ class MainCharacter(Character):
         self.look_at = 1
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
         self.resource = 100
-
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
@@ -159,7 +159,6 @@ class MainCharacter(Character):
                 self.state = 0
             else:
                 self.state = 1
-            self.dir_y = 0
             if self.look_at == -1:
                 self.m_x += 35  # flip x좌표 이미지 보정
         elif self.m_y < 90:
@@ -168,7 +167,6 @@ class MainCharacter(Character):
             else:
                 self.state = 1
             self.m_y = 90
-            self.dir_y = 0
             if self.look_at == -1:
                 self.m_x += 35  # flip x좌표 이미지 보정
 
@@ -219,8 +217,8 @@ class WarriorCharacter(NonePlayableCharacter):
                                              0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
 
     def update(self):
-        self.hit_cool_time()
         self.frame_rate()
+        self.hit_cool_time()
         self.move()
 
     def draw(self):
@@ -241,24 +239,28 @@ class WarriorCharacter(NonePlayableCharacter):
             # elif self.cool_time == 0:
             #   self.state = 2
             #   self.frame = 0
-            if self.cool_time == 0: # 임시로 해둔 것
-                self.state = 2
-                self.frame = 0
+            # if self.cool_time == 0: # 임시로 해둔 것
+            #     self.state = 2
+            #     self.frame = 0
         elif self.state == 1:  # run
             self.frame = (self.frame + 1) % 16
         elif self.state == 2:  # hit
             self.frame = (self.frame + 1) % 16
-            if self.frame == 0:
-                self.state = 0
-                self.cool_time = 100
+
         elif self.state == -1:
             self.frame = (self.frame + 1) % 16
             if self.frame == 0:
                 self.delete_self()
 
     def hit_cool_time(self):
+        if self.frame == 0 and self.state == 2:
+            self.state = 0
+            self.cool_time = 100
         if self.cool_time != 0:
             self.cool_time -= 1
+        elif self.cool_time == 0 and self.state == 0:
+            self.state = 2
+            self.frame = 0
 
     def move(self):
         if self.state != 1:
@@ -309,34 +311,33 @@ def handle_events():
         if event.type == SDL_KEYDOWN:
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
-                # for war in warrior:
-                #     war.state = -1
+            elif event.key == SDLK_q:
+                for war in warrior:
+                    war.state = -1
             elif event.key == SDLK_UP:
-                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70) and user.m_y == 90:
-                    user.state = 2
-                    user.m_x = 280
-                    user.m_y += 5
-                    user.dir_y += 1
-                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70) and user.m_y == 90:
-                    user.state = 2
-                    user.m_x = 780
-                    user.m_y += 5
-                    user.dir_y += 1
-                elif user.state == 2:
-                    user.dir_y += 1
+                user.dir_y += 1
+                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70):
+                    if user.m_y == 90:
+                        user.state = 2
+                        user.m_x = 280
+                        user.m_y += 5
+                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70):
+                    if user.m_y == 90:
+                        user.state = 2
+                        user.m_x = 780
+                        user.m_y += 5
             elif event.key == SDLK_DOWN:
-                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70) and user.m_y == 300:
-                    user.state = 2
-                    user.m_x = 280
-                    user.m_y -= 5
-                    user.dir_y -= 1
-                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70) and user.m_y == 300:
-                    user.state = 2
-                    user.m_x = 780
-                    user.m_y -= 5
-                    user.dir_y -= 1
-                elif user.state == 2:
-                    user.dir_y -= 1
+                user.dir_y -= 1
+                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70):
+                    if user.m_y == 300:
+                        user.state = 2
+                        user.m_x = 280
+                        user.m_y -= 5
+                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70):
+                    if user.m_y == 300:
+                        user.state = 2
+                        user.m_x = 780
+                        user.m_y -= 5
             elif event.key == SDLK_RIGHT:
                 if user.state != 2:
                     user.state = 1
@@ -361,11 +362,9 @@ def handle_events():
 
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_UP:
-                if user.state == 2:
-                    user.dir_y -= 1
+                user.dir_y -= 1
             elif event.key == SDLK_DOWN:
-                if user.state == 2:
-                    user.dir_y += 1
+                user.dir_y += 1
             elif event.key == SDLK_RIGHT:
                 user.dir_x -= 1
                 if user.dir_x == 0 and user.state != 2:
@@ -418,7 +417,7 @@ def update():
     for w in warrior:
         w.update()
     user.update()
-    delay(0.01)
+    delay(1/60)
 
 # 월드를 그린다
 def draw():
