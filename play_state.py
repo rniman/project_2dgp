@@ -3,12 +3,16 @@ import game_framework
 
 width = 1280
 height = 720
+bar_width = 1808
+bar_height = 124
+col_bar_width = 1730
+col_bar_height = 66
 
 class Castle:
     def __init__(self):
         self.castle = load_image("image/castle.png")
-        self.hp_bar = load_image("image/hpBar.png")
-        self.hp = load_image("image/hp.png")
+        self.hp_bar = load_image("image/bar.png")
+        self.hp = load_image("image/hp2.png")
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 1000
@@ -16,8 +20,8 @@ class Castle:
 
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)
-        self.hp_bar.clip_draw_to_origin(39, 94, 222, 26, width//2 - 222 * 3 // 2, height - 26, 222 * 3, 26)
-        self.hp.clip_draw_to_origin(43, 98, 214, 18, width//2 - 214 * 3 // 2, height - 22, 214 * 3 * self.now_hp / self.max_hp, 18)
+        self.hp_bar.clip_draw_to_origin(39, 94, bar_width, bar_height, width//2 - 222 * 3 // 2, height - 26, 222 * 3, 26)
+        self.hp.clip_draw_to_origin(43, 98, col_bar_width, col_bar_height, width//2 - 214 * 3 // 2, height - 22, 214 * 3 * self.now_hp / self.max_hp, 18)
 
 class BackGround:
     def __init__(self):
@@ -63,7 +67,8 @@ class MainCharacter(Character):
         self.main_run = load_image('image/main_run.png')
         self.main_hit = load_image('image/main_hit.png')
         self.main_climb = load_image('image/main_climb.png')
-
+        self.resource_bar = load_image('image/bar.png')
+        self.resource = load_image('image/resource.png')
         self.idle_size = (373, 286)
         self.run_size = (428, 331)
         self.climb_size = (376, 262)
@@ -73,7 +78,7 @@ class MainCharacter(Character):
         self.dir_y = 0
         self.look_at = 1
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
-        self.resource = 100
+        self.now_resource = 100
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
@@ -106,9 +111,16 @@ class MainCharacter(Character):
     def update(self):
         self.frame_rate()
         self.move()
-        self.get_resource()
+        self.get_now_resource()
 
     def draw(self):
+        #
+        self.resource_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width // 2 - 301, 650,
+                                              bar_width // 3, bar_height // 3)
+        # 13, 10은 테두리 맞춰줌
+        self.resource.clip_draw_to_origin(0, 0, col_bar_width, col_bar_height,  width // 2 + 13 - 301, 650 + 10,
+                                          col_bar_width // 3, col_bar_height // 3)
+
         if self.state == 0 and self.look_at == 1:
             self.idle()
         elif self.state == 0 and self.look_at == -1:
@@ -175,9 +187,9 @@ class MainCharacter(Character):
             if self.look_at == -1:
                 self.m_x += 35  # flip x좌표 이미지 보정
 
-    def get_resource(self):
-        if self.resource < 100:
-            self.resource += 1
+    def get_now_resource(self):
+        if self.now_resource < 100:
+            self.now_resource += 1
 
 class NonePlayableCharacter(Character):
     def __init__(self, i_x=0, i_y=0, i_attack=0, i_health = 0):
@@ -358,11 +370,11 @@ def handle_events():
             elif event.key == SDLK_SPACE and user.state != 2:
                 user.frame = 0
                 user.state = 3
-            elif event.key == SDLK_1 and user.resource >= 100:
-                user.resource -= 100
+            elif event.key == SDLK_1 and user.now_resource >= 100:
+                user.now_resource -= 100
                 warrior.append(WarriorCharacter(1))
-            elif event.key == SDLK_5 and user.resource >= 100:
-                user.resource -= 100
+            elif event.key == SDLK_5 and user.now_resource >= 100:
+                user.now_resource -= 100
                 warrior.append(WarriorCharacter(5))
 
         elif event.type == SDL_KEYUP:
