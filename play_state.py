@@ -7,12 +7,17 @@ height = 720
 class Castle:
     def __init__(self):
         self.castle = load_image("image/castle.png")
+        self.hp_bar = load_image("image/hpBar.png")
+        self.hp = load_image("image/hp.png")
         self.m_x = 0
         self.m_y = 245
-        self.health_point = 1000
+        self.max_hp = 1000
+        self.now_hp = 1000
 
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)
+        self.hp_bar.clip_draw_to_origin(39, 94, 222, 26, width//2 - 222 * 3 // 2, height - 26, 222 * 3, 26)
+        self.hp.clip_draw_to_origin(43, 98, 214, 18, width//2 - 214 * 3 // 2, height - 22, 214 * 3 * self.now_hp / self.max_hp, 18)
 
 class BackGround:
     def __init__(self):
