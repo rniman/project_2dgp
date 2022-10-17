@@ -1,5 +1,6 @@
 from pico2d import *
 import game_framework
+import logo_state
 
 width = 1280
 height = 720
@@ -20,8 +21,10 @@ class Castle:
 
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)
-        self.hp_bar.clip_draw_to_origin(39, 94, bar_width, bar_height, width//2 - 222 * 3 // 2, height - 26, 222 * 3, 26)
-        self.hp.clip_draw_to_origin(43, 98, col_bar_width, col_bar_height, width//2 - 214 * 3 // 2, height - 22, 214 * 3 * self.now_hp / self.max_hp, 18)
+        self.hp_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width//2 - 301, 680,
+                                        bar_width // 3, bar_height // 3)
+        self.hp.clip_draw_to_origin(0, 0, col_bar_width  * self.now_hp // self.max_hp, col_bar_height, width//2 + 13 - 301, 680 + 10,
+                                    col_bar_width // 3  * self.now_hp // self.max_hp, col_bar_height // 3)
 
 class BackGround:
     def __init__(self):
@@ -73,12 +76,19 @@ class MainCharacter(Character):
         self.run_size = (428, 331)
         self.climb_size = (376, 262)
         self.hit_size = (647, 504)
-        self.box = []
-        self.dir_x = 0
-        self.dir_y = 0
-        self.look_at = 1
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
-        self.now_resource = 100
+        self.now_resource = 0
+        self.max_resource = 300
+
+        self.dir_x = logo_state.dir_x
+        self.dir_y = logo_state.dir_y
+        self.look_at = 1
+        if self.dir_x != 0:
+            self.state = 1
+            if self.dir_x > 0:
+                self.look_at = 1
+            else:
+                self.look_at = -1
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
@@ -115,11 +125,11 @@ class MainCharacter(Character):
 
     def draw(self):
         #
-        self.resource_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width // 2 - 301, 650,
+        self.resource_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width // 2 - 301, 640,
                                               bar_width // 3, bar_height // 3)
         # 13, 10은 테두리 맞춰줌
-        self.resource.clip_draw_to_origin(0, 0, col_bar_width, col_bar_height,  width // 2 + 13 - 301, 650 + 10,
-                                          col_bar_width // 3, col_bar_height // 3)
+        self.resource.clip_draw_to_origin(0, 0, col_bar_width * self.now_resource // self.max_resource, col_bar_height,  width // 2 + 13 - 301, 640 + 10,
+                                          col_bar_width // 3  * self.now_resource // self.max_resource, col_bar_height // 3)
 
         if self.state == 0 and self.look_at == 1:
             self.idle()
@@ -188,7 +198,7 @@ class MainCharacter(Character):
                 self.m_x += 35  # flip x좌표 이미지 보정
 
     def get_now_resource(self):
-        if self.now_resource < 100:
+        if self.now_resource < 300:
             self.now_resource += 1
 
 class NonePlayableCharacter(Character):
@@ -434,7 +444,7 @@ def update():
     for w in warrior:
         w.update()
     user.update()
-    delay(1/60)
+    delay(0.03)
 
 # 월드를 그린다
 def draw():

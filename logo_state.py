@@ -1,15 +1,18 @@
 from pico2d import *
 import game_framework
+
 import play_state
 
-# fill here
-# running = True -> game_framework에서 다룸
 image = None
+dir_x = None
+dir_y = None
 logo_Time = 0.0
 
 def enter():
-    global image
+    global image, dir_x, dir_y
     image = load_image('image/tuk_credit.png')
+    dir_x = 0
+    dir_y = 0
 
 def exit():
     global image
@@ -33,6 +36,26 @@ def draw():
 
 def handle_events():
     events = get_events()
+    global dir_x, dir_y
+    for event in events:
+        if event.type == SDL_KEYDOWN:
+            if event.key == SDLK_UP:
+                dir_y += 1
+            elif event.key == SDLK_DOWN:
+                dir_y -= 1
+            elif event.key == SDLK_RIGHT:
+                dir_x += 1
+            elif event.key == SDLK_LEFT:
+                dir_x -= 1
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_UP:
+                dir_y -= 1
+            elif event.key == SDLK_DOWN:
+                dir_y += 1
+            elif event.key == SDLK_RIGHT:
+                dir_x -= 1
+            elif event.key == SDLK_LEFT:
+                dir_x += 1
 
 
 
