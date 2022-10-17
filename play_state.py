@@ -53,8 +53,8 @@ class Ladder:
         self.ladder.draw(self.mx[1], 160)
 
 class Character:
-    def __init__(self, i_x=0, i_y=0, i_attack=0):
-        self.state = 0
+    def __init__(self, i_x=0, i_y=0, i_attack=0, i_state=0):
+        self.state = i_state
         self.frame = 0
         self.m_x = i_x
         self.m_y = i_y
@@ -203,10 +203,9 @@ class MainCharacter(Character):
 
 class NonePlayableCharacter(Character):
     def __init__(self, i_x=0, i_y=0, i_attack=0, i_health = 0):
-        super().__init__(i_x, i_y, i_attack)
+        super().__init__(i_x, i_y, i_attack, 1)
         self.health_point = i_health
         self.dir_x = 1
-        self.state = 1
         self.cool_time = 0
 
 class WarriorCharacter(NonePlayableCharacter):
@@ -225,7 +224,7 @@ class WarriorCharacter(NonePlayableCharacter):
         self.run_size = (131, 158)
         self.hit_size = (198, 175)
         self.death_size = (187, 175)
-        self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
+        # self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
 
     def idle(self): # +35, -20 스프라이트 오차 수정
         self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
@@ -321,14 +320,70 @@ class WarriorCharacter(NonePlayableCharacter):
     def delete_self(self):
         warrior.remove(self)
 
-# class EnemyCharacter(Character):
-#     dir_x = -1
-#     health_point = 70
-#
-#     def __init__(self):
-#         self.m_x = 1200
-#         self.m_y = 80
-#         self.attack_damage = 10
+class EnemyWarriorCharacter(NonePlayableCharacter):
+    def __init__(self):
+        super().__init__(1200, 90, 10, 70)
+        self.warrior_idle = load_image('image/Ewarrior_idle.png')
+        self.warrior_run = load_image('image/Ewarrior_run.png')
+        self.warrior_hit = load_image('image/Ewarrior_hit.png')
+        # self.warrior_death = load_image('image/Ewarrior_death.png')
+        self.idle_size = (113, 108)
+        self.run_size = (122, 113)
+        self.hit_size = (174, 136)
+        # self.death_size = (187, 175)
+
+    def idle(self):
+        self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
+                                              0, 'h', self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
+
+    def hit(self):
+        self.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
+                                             0, 'h', self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
+
+    def run(self):
+        self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
+                                             0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+
+    # def death(self):
+    #     self.warrior_death.clip_composite_draw(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
+    #                                          0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
+
+    def update(self):
+        pass
+
+    def draw(self):
+        if self.state == 0:
+            self.idle()
+        elif self.state == 1:
+            self.run()
+        elif self.state == 2:
+            self.hit()
+        # elif self.state == -1:
+        #     self.death()
+
+
+    def frame_rate(self):
+        if self.state == 0:
+            self.frame = (self.frame + 1) % 8
+        elif self.state == 1:
+            self.frame = (self.frame + 1) % 16
+        elif self.state == 2:
+            self.frame = (self.frame + 1) % 12
+
+    def move(self):
+        pass
+
+    def hit_cool_time(self):
+        pass
+
+    def check_enenmy(self):
+        pass
+
+    def meet_enenmy(self):
+        pass
+
+    def delete_self(self):
+        pass
 
 def handle_events():
     global user
@@ -417,6 +472,7 @@ floor = None
 castle = None
 user = None
 warrior = None
+e_warrior = None
 time = 0
 
 # 초기화

@@ -19,6 +19,7 @@ def exit():
     del image
 
 def update():
+    pass
     # logo time을 계산하고 1초가 넘으면 running을 false로
     global logo_Time  # ,  running
     delay(0.01)
