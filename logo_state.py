@@ -24,7 +24,7 @@ def update():
     global logo_Time  # ,  running
     delay(0.01)
     logo_Time += 0.01
-    if logo_Time >= 1.0:
+    if logo_Time >= 0.0: # 로고타임off
         logo_Time = 0.0
         # running = False
         game_framework.change_state(play_state)
