@@ -13,7 +13,7 @@ class Castle:
     def __init__(self):
         self.castle = load_image("image/castle.png")
         self.hp_bar = load_image("image/bar.png")
-        self.hp = load_image("image/hp2.png")
+        self.hp = load_image("image/hp.png")
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 1000
@@ -63,7 +63,6 @@ class Character:
 
 
 class MainCharacter(Character):
-
     def __init__(self):
         super().__init__(100, 90, 10)
         self.main_idle = load_image('image/main_idle.png')
@@ -209,21 +208,27 @@ class NonePlayableCharacter(Character):
         self.cool_time = 0
 
 class WarriorCharacter(NonePlayableCharacter):
-
+    warrior_idle = None
+    warrior_run = None
+    warrior_hit = None
+    warrior_death = None
+    idle_size = (121, 106)
+    run_size = (131, 158)
+    hit_size = (198, 175)
+    death_size = (187, 175)
     def __init__(self, i_key):
         # 1층 115  2층 325
         if i_key == 1:
             super().__init__(90, 115, 5, 50)
         elif i_key == 5:
             super().__init__(90, 325, 5, 50)
-        self.warrior_idle = load_image('image/warrior_idle.png')
-        self.warrior_run = load_image('image/warrior_run.png')
-        self.warrior_hit = load_image('image/warrior_hit.png')
-        self.warrior_death = load_image('image/warrior_death.png')
-        self.idle_size = (121, 106)
-        self.run_size = (131, 158)
-        self.hit_size = (198, 175)
-        self.death_size = (187, 175)
+
+        if WarriorCharacter.warrior_idle == None:
+            self.warrior_idle = load_image('image/warrior_idle.png')
+            self.warrior_run = load_image('image/warrior_run.png')
+            self.warrior_hit = load_image('image/warrior_hit.png')
+            self.warrior_death = load_image('image/warrior_death.png')
+
         # self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
 
     def idle(self): # +35, -20 스프라이트 오차 수정
@@ -321,16 +326,21 @@ class WarriorCharacter(NonePlayableCharacter):
         warrior.remove(self)
 
 class EnemyWarriorCharacter(NonePlayableCharacter):
+    warrior_idle = None
+    warrior_run = None
+    warrior_hit = None
+    warrior_death = None
+    idle_size = (113, 108)
+    run_size = (122, 113)
+    hit_size = (174, 136)
+    death_size = (187, 175)
     def __init__(self):
         super().__init__(1200, 90, 10, 70)
-        self.warrior_idle = load_image('image/Ewarrior_idle.png')
-        self.warrior_run = load_image('image/Ewarrior_run.png')
-        self.warrior_hit = load_image('image/Ewarrior_hit.png')
-        # self.warrior_death = load_image('image/Ewarrior_death.png')
-        self.idle_size = (113, 108)
-        self.run_size = (122, 113)
-        self.hit_size = (174, 136)
-        # self.death_size = (187, 175)
+        if EnemyWarriorCharacter.warrior_idle == None:
+            self.warrior_idle = load_image('image/Ewarrior_idle.png')
+            self.warrior_run = load_image('image/Ewarrior_run.png')
+            self.warrior_hit = load_image('image/Ewarrior_hit.png')
+            # self.warrior_death = load_image('image/Ewarrior_death.png')
 
     def idle(self):
         self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
@@ -386,7 +396,7 @@ class EnemyWarriorCharacter(NonePlayableCharacter):
         pass
 
 def handle_events():
-    global user
+    global mainChar
     global warrior
     events = get_events()
     for event in events:
@@ -397,80 +407,80 @@ def handle_events():
                 for war in warrior:
                     war.state = -1
             elif event.key == SDLK_UP:
-                user.dir_y += 1
-                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70):
-                    if user.m_y == 90:
-                        user.state = 2
-                        user.m_x = 280
-                        user.m_y += 5
-                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70):
-                    if user.m_y == 90:
-                        user.state = 2
-                        user.m_x = 780
-                        user.m_y += 5
+                mainChar.dir_y += 1
+                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
+                    if mainChar.m_y == 90:
+                        mainChar.state = 2
+                        mainChar.m_x = 280
+                        mainChar.m_y += 5
+                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
+                    if mainChar.m_y == 90:
+                        mainChar.state = 2
+                        mainChar.m_x = 780
+                        mainChar.m_y += 5
             elif event.key == SDLK_DOWN:
-                user.dir_y -= 1
-                if (user.box[0] > 300 - 70 and user.box[2] < 300 + 70):
-                    if user.m_y == 300:
-                        user.state = 2
-                        user.m_x = 280
-                        user.m_y -= 5
-                elif (user.box[0] > 800 - 70 and user.box[2] < 800 + 70):
-                    if user.m_y == 300:
-                        user.state = 2
-                        user.m_x = 780
-                        user.m_y -= 5
+                mainChar.dir_y -= 1
+                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
+                    if mainChar.m_y == 300:
+                        mainChar.state = 2
+                        mainChar.m_x = 280
+                        mainChar.m_y -= 5
+                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
+                    if mainChar.m_y == 300:
+                        mainChar.state = 2
+                        mainChar.m_x = 780
+                        mainChar.m_y -= 5
             elif event.key == SDLK_RIGHT:
-                if user.state != 2:
-                    user.state = 1
-                user.dir_x += 1
-                if user.dir_x == 0 and user.state != 2:
-                    user.state = 0
+                if mainChar.state != 2:
+                    mainChar.state = 1
+                mainChar.dir_x += 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
             elif event.key == SDLK_LEFT:
-                if user.state != 2:
-                    user.state = 1
-                user.dir_x -= 1
-                if user.dir_x == 0 and user.state != 2:
-                    user.state = 0
-            elif event.key == SDLK_SPACE and user.state != 2:
-                user.frame = 0
-                user.state = 3
-            elif event.key == SDLK_1 and user.now_resource >= 100:
-                user.now_resource -= 100
+                if mainChar.state != 2:
+                    mainChar.state = 1
+                mainChar.dir_x -= 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+            elif event.key == SDLK_SPACE and mainChar.state != 2:
+                mainChar.frame = 0
+                mainChar.state = 3
+            elif event.key == SDLK_1 and mainChar.now_resource >= 100:
+                mainChar.now_resource -= 100
                 warrior.append(WarriorCharacter(1))
-            elif event.key == SDLK_5 and user.now_resource >= 100:
-                user.now_resource -= 100
+            elif event.key == SDLK_5 and mainChar.now_resource >= 100:
+                mainChar.now_resource -= 100
                 warrior.append(WarriorCharacter(5))
 
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_UP:
-                user.dir_y -= 1
+                mainChar.dir_y -= 1
             elif event.key == SDLK_DOWN:
-                user.dir_y += 1
+                mainChar.dir_y += 1
             elif event.key == SDLK_RIGHT:
-                user.dir_x -= 1
-                if user.dir_x == 0 and user.state != 2:
-                    user.state = 0
-                elif user.state != 2:
-                    user.state = 1
+                mainChar.dir_x -= 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+                elif mainChar.state != 2:
+                    mainChar.state = 1
             elif event.key == SDLK_LEFT:
-                user.dir_x += 1
-                if user.dir_x == 0 and user.state != 2:
-                    user.state = 0
-                elif user.state != 2:
-                    user.state = 1
+                mainChar.dir_x += 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+                elif mainChar.state != 2:
+                    mainChar.state = 1
 
-        if user.dir_x > 0:
-            user.look_at = 1
-        elif user.dir_x < 0:
-            user.look_at = -1
+        if mainChar.dir_x > 0:
+            mainChar.look_at = 1
+        elif mainChar.dir_x < 0:
+            mainChar.look_at = -1
 
 
 back_ground = None
 ladder = None
 floor = None
 castle = None
-user = None
+mainChar = None
 warrior = None
 e_warrior = None
 time = 0
@@ -479,27 +489,35 @@ time = 0
 def enter():
     global back_ground, ladder, floor
     global castle
-    global user, warrior
+    global mainChar
+    global warrior
+    global e_warrior
     back_ground = BackGround()
     ladder = Ladder()
     floor = Floor()
-    warrior = []
     castle = Castle()
-    user = MainCharacter()
+    mainChar = MainCharacter()
+    warrior = []
+    e_warrior = []
+
 # 종료
 def exit():
     del back_ground
     del ladder
     del floor
-    del warrior
-    del user
     del castle
+    del mainChar
+    del warrior
+    del e_warrior
 
 # 월드의 존재하는 객체들을 업데이트
 def update():
     for w in warrior:
         w.update()
-    user.update()
+    for ew in e_warrior:
+        ew.update()
+    mainChar.update()
+
     delay(0.03)
 
 # 월드를 그린다
@@ -509,9 +527,14 @@ def draw():
     castle.draw()
     floor.draw()
     ladder.draw()
+
+    mainChar.draw()
+
     for w in warrior:
         w.draw()
-    user.draw()
+    for ew in e_warrior:
+        ew.draw()
+
     update_canvas()
 
 
