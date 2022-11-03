@@ -23,7 +23,7 @@ class MainCharacter(Character):
         self.climb_size = (376, 262)
         self.hit_size = (647, 504)
         self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
-        self.now_resource = 0
+        self.now_resource = 100
         self.max_resource = 300
 
         self.dir_x = logo_state.dir_x

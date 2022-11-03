@@ -7,7 +7,6 @@ warrior = None
 e_warrior = None
 time = 0
 
-
 from pico2d import *
 import game_framework
 import logo_state
@@ -137,7 +136,8 @@ def exit():
 def update():
     global time
     for w in warrior:
-        w.update()
+        if w.update() == -1:
+            warrior.remove(w)
     for ew in e_warrior:
         ew.update()
     mainChar.update()

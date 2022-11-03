@@ -46,7 +46,7 @@ class Warrior(NPC):
     def update(self):
         self.frame_rate()
         if self.frame == 0 and self.state == -1:
-            self.delete_self()
+            return -1
         self.hit_cool_time()
         self.move()
 
@@ -118,5 +118,3 @@ class Warrior(NPC):
         else:
             self.state = 0
 
-    def delete_self(self):
-        warrior.remove(self)
