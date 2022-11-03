@@ -1,3 +1,13 @@
+back_ground = None
+ladder = None
+floor = None
+castle = None
+mainChar = None
+warrior = None
+e_warrior = None
+time = 0
+
+
 from pico2d import *
 import game_framework
 import logo_state
@@ -6,6 +16,9 @@ from castle import Castle
 from back_ground import BackGround
 from floor import Floor
 from ladder import Ladder
+from main_character import MainCharacter
+from warrior import Warrior
+from enemy_warrior import EnemyWarrior
 
 width = 1280
 height = 720
@@ -14,362 +27,6 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-
-class Character:
-    def __init__(self, i_x=0, i_y=0, i_attack=0, i_state=0):
-        self.state = i_state
-        self.frame = 0
-        self.m_x = i_x
-        self.m_y = i_y
-        self.dir_x = 0
-        self.attack_damage = i_attack
-
-class MainCharacter(Character):
-    def __init__(self):
-        super().__init__(100, 90, 10)
-        self.main_idle = load_image('image/main_idle.png')
-        self.main_run = load_image('image/main_run.png')
-        self.main_hit = load_image('image/main_hit.png')
-        self.main_climb = load_image('image/main_climb.png')
-        self.resource_bar = load_image('image/bar.png')
-        self.resource = load_image('image/resource.png')
-        self.idle_size = (373, 286)
-        self.run_size = (428, 331)
-        self.climb_size = (376, 262)
-        self.hit_size = (647, 504)
-        self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0]//6, self.m_y + self.idle_size[1]//3]
-        self.now_resource = 0
-        self.max_resource = 300
-
-        self.dir_x = logo_state.dir_x
-        self.dir_y = logo_state.dir_y
-        self.look_at = 1
-        if self.dir_x != 0:
-            self.state = 1
-            if self.dir_x > 0:
-                self.look_at = 1
-            else:
-                self.look_at = -1
-
-    def idle(self):
-        self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
-                                 self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
-
-    def flip_idle(self):
-        self.main_idle.clip_composite_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],
-                                           0, 'h', self.m_x, self.m_y, self.idle_size[0] // 3, self.idle_size[1] // 3)
-
-    def run(self):
-        self.main_run.clip_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
-                                self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
-
-    def flip_run(self):
-        self.main_run.clip_composite_draw(0 + self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
-                                          0, 'h', self.m_x, self.m_y, self.run_size[0] // 3, self.run_size[1] // 3)
-
-    def climb(self):
-        self.main_climb.clip_draw(0 + self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
-                                  self.m_x, self.m_y, self.climb_size[0] // 3, self.climb_size[1] // 3)
-
-    def hit(self):  # y, 120
-        self.main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
-                                self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
-
-    def flip_hit(self):  # y, 120
-        self.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
-                                          0, 'h', self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
-
-    def update(self):
-        self.frame_rate()
-        self.move()
-        self.get_now_resource()
-
-    def draw(self):
-        #
-        self.resource_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width // 2 - 301, 640,
-                                              bar_width // 3, bar_height // 3)
-        # 13, 10은 테두리 맞춰줌
-        self.resource.clip_draw_to_origin(0, 0, col_bar_width * self.now_resource // self.max_resource, col_bar_height,  width // 2 + 13 - 301, 640 + 10,
-                                          col_bar_width // 3  * self.now_resource // self.max_resource, col_bar_height // 3)
-
-        if self.state == 0 and self.look_at == 1:
-            self.idle()
-        elif self.state == 0 and self.look_at == -1:
-            self.flip_idle()
-        elif self.state == 1 and self.look_at == 1:
-            self.run()
-        elif self.state == 1 and self.look_at == -1:
-            self.flip_run()
-        elif self.state == 2:
-            self.climb()
-        elif self.state == 3 and self.look_at == 1:
-            self.hit()
-        elif self.state == 3 and self.look_at == -1:
-            self.flip_hit()
-
-    def frame_rate(self):
-        if self.state == 0:
-            self.frame = (self.frame + 1) % 8
-        elif self.state == 1:
-            self.frame = (self.frame + 1) % 8
-        elif self.state == 2:
-            self.frame = (self.frame + 1) % 8
-        elif self.state == 3:
-            self.frame = (self.frame + 1) % 12
-            if self.frame == 0:
-                if self.dir_x == 0:
-                    self.state = 0
-                else:
-                    self.state = 1
-
-    def set_box(self):
-        if self.look_at == 1:
-            self.box = [self.m_x, self.m_y, self.m_x + self.idle_size[0] // 6, self.m_y + self.idle_size[1] // 3]
-        else:
-            self.box = [self.m_x - self.idle_size[0] // 6, self.m_y, self.m_x, self.m_y - self.idle_size[1] // 3]
-
-    def move(self):
-        if self.state == 1 or self.state == 0:
-            self.m_x += self.dir_x * 5
-            if self.m_x > 1200:
-                self.m_x = 1200
-            elif self.m_x < 100:
-                self.m_x = 100
-            self.set_box()
-        elif self.state == 2:
-            self.ladder_move()
-
-    def ladder_move(self):
-        self.m_y += self.dir_y * 5
-        if self.m_y > 300:
-            self.m_y = 300
-            if self.dir_x == 0:
-                self.state = 0
-            else:
-                self.state = 1
-            if self.look_at == -1:
-                self.m_x += 35  # flip x좌표 이미지 보정
-        elif self.m_y < 90:
-            if self.dir_x == 0:
-                self.state = 0
-            else:
-                self.state = 1
-            self.m_y = 90
-            if self.look_at == -1:
-                self.m_x += 35  # flip x좌표 이미지 보정
-
-    def get_now_resource(self):
-        if self.now_resource < 300:
-            self.now_resource += 1
-
-class NonePlayableCharacter(Character):
-    def __init__(self, i_x=0, i_y=0, i_attack=0, i_health = 0):
-        super().__init__(i_x, i_y, i_attack, 1)
-        self.health_point = i_health
-        self.dir_x = 1
-        self.cool_time = 0
-
-class WarriorCharacter(NonePlayableCharacter):
-    warrior_idle = None
-    warrior_run = None
-    warrior_hit = None
-    warrior_death = None
-    idle_size = (121, 106)
-    run_size = (131, 158)
-    hit_size = (198, 175)
-    death_size = (187, 175)
-    def __init__(self, i_key):
-        # 1층 115  2층 325
-        if i_key == 1:
-            super().__init__(90, 115, 5, 50)
-        elif i_key == 5:
-            super().__init__(90, 325, 5, 50)
-
-        if WarriorCharacter.warrior_idle == None:
-            self.warrior_idle = load_image('image/warrior_idle.png')
-            self.warrior_run = load_image('image/warrior_run.png')
-            self.warrior_hit = load_image('image/warrior_hit.png')
-            self.warrior_death = load_image('image/warrior_death.png')
-
-        # self.frame_mouse = 0 # 기존 프레임 레이트에 맞추기 위한 마우스 프레임
-
-    def idle(self): # +35, -20 스프라이트 오차 수정
-        self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
-                                              0, 'h', self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
-
-    def hit(self): # +17, +15 스프라이트 오차 수정
-        self.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
-                                             0, 'h', self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
-
-    def run(self):
-        self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
-                                             0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
-
-    def death(self):
-        self.warrior_death.clip_composite_draw(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
-                                             0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
-
-    def update(self):
-        self.frame_rate()
-        if self.frame == 0 and self.state == -1:
-            self.delete_self()
-        self.hit_cool_time()
-        self.move()
-
-    def draw(self):
-        if self.state == 0:
-            self.idle()
-        elif self.state == 1:
-            self.run()
-        elif self.state == 2:
-            self.hit()
-        elif self.state == -1:
-            self.death()
-
-    def frame_rate(self):
-        if self.state == 0:  # idle
-            self.frame = (self.frame + 1) % 8
-            # 적이 없으면 상태 바꿔야함
-            # if self.check_enemy == False:
-            # elif self.cool_time == 0:
-            #   self.state = 2
-            #   self.frame = 0
-            # if self.cool_time == 0: # 임시로 해둔 것
-            #     self.state = 2
-            #     self.frame = 0
-        elif self.state == 1:  # run
-            self.frame = (self.frame + 1) % 16
-        elif self.state == 2:  # hit
-            self.frame = (self.frame + 1) % 16
-
-        elif self.state == -1:
-            self.frame = (self.frame + 1) % 16
-
-    def hit_cool_time(self):
-        if self.frame == 0 and self.state == 2:
-            self.state = 0
-            self.cool_time = 100
-        if self.cool_time != 0:
-            self.cool_time -= 1
-        elif self.cool_time == 0 and self.state == 0:
-            self.state = 2
-            self.frame = 0
-
-    def move(self):
-        if self.state != 1:
-            return
-        self.m_x += self.dir_x * 5
-        if self.m_x > 1200:
-            self.m_x = 1200
-
-        # 만났을 때 실험
-        # 원래는 히트 박스끼리 검사
-        # if self.check_enemy(enemy):
-        if self.m_x >= 500:
-            self.meet_enemy()
-
-    def check_enemy(self, enemy_list):
-        for enemy in enemy_list:
-            if self.m_x + 50 > enemy.m_x:
-                return True
-        return False
-
-    def meet_enemy(self):
-        # 여기서 검사
-        self.dir_x = 0
-        if self.cool_time == 0:
-            if self.frame != 0:
-                self.frame = 0
-            self.state = 2
-        else:
-            self.state = 0
-
-    def delete_self(self):
-        warrior.remove(self)
-
-class EnemyWarriorCharacter(NonePlayableCharacter):
-    warrior_idle = None
-    warrior_run = None
-    warrior_hit = None
-    warrior_death = None
-    idle_size = (120, 108)
-    run_size = (123, 113)
-    hit_size = (174, 136)
-    death_size = (187, 175)
-    def __init__(self):
-        super().__init__(1200, 40, 10, 70)
-        if EnemyWarriorCharacter.warrior_idle == None:
-            self.warrior_idle = load_image('image/Ewarrior_idle.png')
-            self.warrior_run = load_image('image/Ewarrior_run.png')
-            self.warrior_hit = load_image('image/Ewarrior_hit.png')
-            # self.warrior_death = load_image('image/Ewarrior_death.png')
-
-    def idle(self):
-        self.warrior_idle.clip_draw_to_origin(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
-                                              self.m_x, self.m_y, self.idle_size[0], self.idle_size[1])
-
-    def hit(self):
-        self.warrior_hit.clip_draw_to_origin(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
-                                             self.m_x, self.m_y, self.hit_size[0], self.hit_size[1])
-
-    def run(self):
-        self.warrior_run.clip_draw_to_origin(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
-                                            self.m_x, self.m_y, self.run_size[0], self.run_size[1])
-
-    # def death(self):
-    #     self.warrior_death.clip_composite_draw(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
-    #                                          0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
-
-    def update(self):
-        self.frame_rate()
-        self.hit_cool_time()
-        self.move()
-
-    def draw(self):
-        if self.state == 0:
-            self.idle()
-        elif self.state == 1:
-            self.run()
-        elif self.state == 2:
-            self.hit()
-        # elif self.state == -1:
-        #     self.death()
-
-
-    def frame_rate(self):
-        if self.state == 0: # idle
-            self.frame = (self.frame + 1) % 8
-        elif self.state == 1: # run
-            self.frame = (self.frame + 1) % 16
-        elif self.state == 2: # hit
-            self.frame = (self.frame + 1) % 12
-
-    def move(self):
-        if self.state != 1:
-            return
-        self.m_x -= self.dir_x * 5
-        if self.m_x < 100:
-            self.m_x = 100
-            self.state = 2
-
-    def hit_cool_time(self):
-        if self.frame == 0 and self.state == 2:
-            self.state = 0
-            self.cool_time = 100
-        if self.cool_time != 0:
-            self.cool_time -= 1
-        elif self.cool_time == 0 and self.state == 0:
-            self.state = 2
-            self.frame = 0
-
-    def check_enenmy(self):
-        pass
-
-    def meet_enenmy(self):
-        pass
-
-    def delete_self(self):
-        pass
 
 def handle_events():
     global mainChar
@@ -423,10 +80,10 @@ def handle_events():
                 mainChar.state = 3
             elif event.key == SDLK_1 and mainChar.now_resource >= 100:
                 mainChar.now_resource -= 100
-                warrior.append(WarriorCharacter(1))
+                warrior.append(Warrior(1))
             elif event.key == SDLK_5 and mainChar.now_resource >= 100:
                 mainChar.now_resource -= 100
-                warrior.append(WarriorCharacter(5))
+                warrior.append(Warrior(5))
 
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_UP:
@@ -450,16 +107,6 @@ def handle_events():
             mainChar.look_at = 1
         elif mainChar.dir_x < 0:
             mainChar.look_at = -1
-
-
-back_ground = None
-ladder = None
-floor = None
-castle = None
-mainChar = None
-warrior = None
-e_warrior = None
-time = 0
 
 # 초기화
 def enter():
@@ -496,7 +143,7 @@ def update():
     mainChar.update()
 
     if time % 100 == 0:
-        e_warrior.append(EnemyWarriorCharacter())
+        e_warrior.append(EnemyWarrior())
     time += 1
     delay(0.03)
 
