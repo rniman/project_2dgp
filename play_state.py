@@ -2,6 +2,11 @@ from pico2d import *
 import game_framework
 import logo_state
 
+from castle import Castle
+from back_ground import BackGround
+from floor import Floor
+from ladder import Ladder
+
 width = 1280
 height = 720
 bar_width = 1808
@@ -9,49 +14,6 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-
-class Castle:
-    def __init__(self):
-        self.castle = load_image("image/castle.png")
-        self.hp_bar = load_image("image/bar.png")
-        self.hp = load_image("image/hp.png")
-        self.m_x = 0
-        self.m_y = 245
-        self.max_hp = 1000
-        self.now_hp = 1000
-
-    def draw(self):
-        self.castle.draw(self.m_x, self.m_y)
-        self.hp_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width//2 - 301, 680,
-                                        bar_width // 3, bar_height // 3)
-        self.hp.clip_draw_to_origin(0, 0, col_bar_width  * self.now_hp // self.max_hp, col_bar_height, width//2 + 13 - 301, 680 + 10,
-                                    col_bar_width // 3  * self.now_hp // self.max_hp, col_bar_height // 3)
-
-class BackGround:
-    def __init__(self):
-        self.backGround = load_image('image/Bground.png')
-
-    def draw(self):
-        self.backGround.draw(width // 2, height // 2)
-
-class Floor:
-    def __init__(self):
-        self.floor = load_image('image/tile.png')
-        self.tile_width = 90
-
-    def draw(self):
-        for x in range(98, width, self.tile_width):
-            self.floor.draw(x, 245)
-            x = x + self.tile_width
-
-class Ladder:
-    def __init__(self):
-        self.ladder = load_image('image/ladder.png')
-        self.mx = (300, 800)
-
-    def draw(self):
-        self.ladder.draw(self.mx[0], 160)
-        self.ladder.draw(self.mx[1], 160)
 
 class Character:
     def __init__(self, i_x=0, i_y=0, i_attack=0, i_state=0):
@@ -61,7 +23,6 @@ class Character:
         self.m_y = i_y
         self.dir_x = 0
         self.attack_damage = i_attack
-
 
 class MainCharacter(Character):
     def __init__(self):
