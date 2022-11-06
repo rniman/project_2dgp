@@ -37,6 +37,9 @@ def handle_events():
             elif event.key == SDLK_q:
                 for war in warrior:
                     war.state = -1
+            elif event.key == SDLK_w:
+                for ewar in e_warrior:
+                    ewar.state = -1
             elif event.key == SDLK_UP:
                 mainChar.dir_y += 1
                 if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
@@ -138,7 +141,9 @@ def update():
         if w.update() == -1:
             warrior.remove(w)
     for ew in e_warrior:
-        ew.update()
+        if ew.update() == -1:
+            e_warrior.remove(ew)
+
     mainChar.update()
 
     if time % 100 == 0:

@@ -9,6 +9,80 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
+SPD, RD, LD, RU, LU, UD, DD, UU, DU = range(9)
+
+key_event_table = {
+
+}
+
+class IDLE:
+    @staticmethod
+    def stete_enter():
+        pass
+
+    @staticmethod
+    def state_exit():
+        pass
+
+    @staticmethod
+    def state_do():
+        pass
+
+    @staticmethod
+    def state_draw():
+        pass
+
+class RUN:
+    @staticmethod
+    def stete_enter():
+        pass
+
+    @staticmethod
+    def state_exit():
+        pass
+
+    @staticmethod
+    def state_do():
+        pass
+
+    @staticmethod
+    def state_draw():
+        pass
+
+class HIT:
+    @staticmethod
+    def stete_enter():
+        pass
+
+    @staticmethod
+    def state_exit():
+        pass
+
+    @staticmethod
+    def state_do():
+        pass
+
+    @staticmethod
+    def state_draw():
+        pass
+
+class CLIMB:
+    @staticmethod
+    def stete_enter():
+        pass
+
+    @staticmethod
+    def state_exit():
+        pass
+
+    @staticmethod
+    def state_do():
+        pass
+
+    @staticmethod
+    def state_draw():
+        pass
+
 class MainCharacter(Character):
     def __init__(self):
         super().__init__(100, 90, 10)
@@ -35,6 +109,9 @@ class MainCharacter(Character):
                 self.look_at = 1
             else:
                 self.look_at = -1
+
+    def handle_event(self, event):
+        pass
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],

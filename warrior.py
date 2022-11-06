@@ -47,6 +47,9 @@ class Warrior(NPC):
             return -1
         self.hit_cool_time()
         self.move()
+        if self.check_enemy() and self.state != -1:
+            self.meet_enemy()
+        return 0
 
     def draw(self):
         if self.state == 0:
@@ -73,7 +76,6 @@ class Warrior(NPC):
             self.frame = (self.frame + 1) % 16
         elif self.state == 2:  # hit
             self.frame = (self.frame + 1) % 16
-
         elif self.state == -1:
             self.frame = (self.frame + 1) % 16
 
@@ -81,6 +83,7 @@ class Warrior(NPC):
         if self.frame == 0 and self.state == 2:
             self.state = 0
             self.cool_time = 100
+
         if self.cool_time != 0:
             self.cool_time -= 1
         elif self.cool_time == 0 and self.state == 0:
@@ -96,8 +99,6 @@ class Warrior(NPC):
 
         # 만났을 때 실험
         # 원래는 히트 박스끼리 검사
-        if self.check_enemy():
-            self.meet_enemy()
 
 
     def check_enemy(self):
@@ -112,6 +113,9 @@ class Warrior(NPC):
         return False
 
     def meet_enemy(self):
+        if self.state == 2:
+            return
+
         # 여기서 검사
         self.dir_x = 0
         if self.cool_time == 0:
