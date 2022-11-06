@@ -26,7 +26,6 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-
 def handle_events():
     global mainChar
     global warrior

@@ -1,7 +1,5 @@
 from pico2d import *
 from npc import NPC
-from play_state import warrior
-# warrior = None
 
 class Warrior(NPC):
     warrior_idle = None
@@ -98,12 +96,17 @@ class Warrior(NPC):
 
         # 만났을 때 실험
         # 원래는 히트 박스끼리 검사
-        # if self.check_enemy(enemy):
-        if self.m_x >= 500:
+        if self.check_enemy():
             self.meet_enemy()
 
-    def check_enemy(self, enemy_list):
-        for enemy in enemy_list:
+
+    def check_enemy(self):
+        from play_state import e_warrior
+
+        if e_warrior == None:
+             return False
+
+        for enemy in e_warrior:
             if self.m_x + 50 > enemy.m_x:
                 return True
         return False
