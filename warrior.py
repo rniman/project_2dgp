@@ -1,5 +1,7 @@
 from pico2d import *
 from npc import NPC
+from game_world import game_object
+from game_world import remove_object
 
 class Warrior(NPC):
     warrior_idle = None
@@ -44,12 +46,11 @@ class Warrior(NPC):
     def update(self):
         self.frame_rate()
         if self.frame == 0 and self.state == -1:
-            return -1
+            remove_object(self)
         self.hit_cool_time()
         self.move()
         if self.check_enemy() and self.state != -1:
             self.meet_enemy()
-        return 0
 
     def draw(self):
         if self.state == 0:
@@ -102,12 +103,12 @@ class Warrior(NPC):
 
 
     def check_enemy(self):
-        from play_state import e_warrior
-
-        if e_warrior == None:
-             return False
-
-        for enemy in e_warrior:
+        # from play_state import e_warrior
+        #
+        #
+        # if e_warrior == None:
+        #      return False
+        for enemy in game_object[1]:
             if self.m_x + 50 > enemy.m_x:
                 return True
         return False

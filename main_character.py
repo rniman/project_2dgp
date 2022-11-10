@@ -1,6 +1,8 @@
 import logo_state
 from pico2d import *
 from character import Character
+from warrior import Warrior
+import game_world
 
 width = 1280
 height = 720
@@ -9,7 +11,7 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-SPACE, RD, LD, RU, LU, UD, DD, UU, DU = range(9)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5 = range(11)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_SPACE) : SPACE,
@@ -17,6 +19,8 @@ key_event_table = {
     (SDL_KEYDOWN, SDLK_LEFT): LD,
     (SDL_KEYDOWN, SDLK_UP): UD,
     (SDL_KEYDOWN, SDLK_DOWN): DD,
+    (SDL_KEYDOWN, SDLK_1): KEY1,
+    (SDL_KEYDOWN, SDLK_5): KEY5,
     (SDL_KEYUP, SDLK_RIGHT): RU,
     (SDL_KEYUP, SDLK_LEFT): LU,
     (SDL_KEYUP, SDLK_UP): UU,
@@ -32,8 +36,13 @@ class IDLE:
         pass
 
     @staticmethod
-    def exit(self):
-        self.frame = 0
+    def exit(self, event):
+        if event == KEY1:
+            self.summon(event)
+        elif event == KEY5:
+            self.summon(event)
+        else:
+            self.frame = 0
 
     @staticmethod
     def do(self):
@@ -61,8 +70,13 @@ class RUN:
 
 
     @staticmethod
-    def exit(self):
-        self.frame = 0
+    def exit(self, event):
+        if event == KEY1:
+            self.summon(event)
+        elif event == KEY5:
+            self.summon(event)
+        else:
+            self.frame = 0
 
     @staticmethod
     def do(self):
@@ -100,8 +114,11 @@ class HIT:
             self.dir_y += 1
 
     @staticmethod
-    def exit(self):
-        pass
+    def exit(self, event):
+        if event == KEY1:
+            self.summon(event)
+        elif event == KEY5:
+            self.summon(event)
 
     @staticmethod
     def do(self):
@@ -171,8 +188,12 @@ class CLIMB:
             self.dir_x += 1
 
     @staticmethod
-    def exit(self):
+    def exit(self, event):
         self.frame = 0
+        if event == KEY1:
+            self.summon(event)
+        elif event == KEY5:
+            self.summon(event)
 
     @staticmethod
     def do(self):
@@ -183,7 +204,6 @@ class CLIMB:
             if self.dir_x == 0:
                 self.change_state(IDLE, CLIMB)
                 self.set_look()
-
             else:
                 self.change_state(RUN, CLIMB)
                 self.set_look()
@@ -209,10 +229,10 @@ class CLIMB:
                                   self.m_x, self.m_y, self.climb_size[0], self.climb_size[1])
 
 next_state = {
-    IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
-    RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
-    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT},
-    CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB}
+    IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: IDLE,  KEY5: IDLE},
+    RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: RUN,  KEY5: RUN},
+    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT, KEY1: HIT,  KEY5: HIT},
+    CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: CLIMB,  KEY5: CLIMB}
 }
 
 class MainCharacter(Character):
@@ -251,7 +271,7 @@ class MainCharacter(Character):
         self.event_que.insert(0, event)
 
     def change_state(self, next_state, prev_state = None):
-        self.cur_state.exit(self)
+        self.cur_state.exit(self, None)
         self.cur_state = next_state
         if prev_state != None:
             self.prev_state = prev_state
@@ -268,7 +288,7 @@ class MainCharacter(Character):
         # 이벤트 큐가 있다면 이벤트 발생
         if self.event_que:
             event = self.event_que.pop()
-            self.cur_state.exit(self)
+            self.cur_state.exit(self, event)
             self.prev_state = self.cur_state
             self.cur_state = next_state[self.cur_state][event]
             self.cur_state.enter(self, event)
@@ -299,3 +319,14 @@ class MainCharacter(Character):
             self.look_at = 1
         elif self.dir_x == -1:
             self.look_at = - 1
+
+    def summon(self, event):
+        if event == KEY1 and self.now_resource >= 100:
+            self.now_resource -= 100
+            warrior = Warrior(1)
+            game_world.add_object(warrior, 2)
+        elif event == KEY5 and self.now_resource >= 100:
+            self.now_resource -= 100
+            warrior = Warrior(5)
+            game_world.add_object(warrior, 2)
+

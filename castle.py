@@ -17,6 +17,9 @@ class Castle:
         self.max_hp = 1000
         self.now_hp = 1000
 
+    def update(self):
+        pass
+
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)
         self.hp_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width//2 - 301, 680,
