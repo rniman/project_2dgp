@@ -9,7 +9,7 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-TIMER, SPACE, RD, LD, RU, LU, UD, DD, UU, DU = range(10)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU = range(9)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_SPACE) : SPACE,
@@ -28,7 +28,8 @@ class IDLE:
     @staticmethod
     def enter(self, event):
         self.dir_x = 0
-        self.dir_y = 0
+        # self.dir_y = 0
+        pass
 
     @staticmethod
     def exit(self):
@@ -55,10 +56,10 @@ class RUN:
         if event == LD or event == RU:
             self.look_at = -1
             self.dir_x -= 1
-        else:
+        elif event == RD or event == LU:
             self.look_at = 1
             self.dir_x += 1
-        pass
+
 
     @staticmethod
     def exit(self):
@@ -88,8 +89,16 @@ class RUN:
 class HIT:
     @staticmethod
     def enter(self, event):
-        if event != SPACE:
+        if event == SPACE and self.prev_state != HIT:
             self.frame = 0
+        elif event == LD or event == RU:
+            self.dir_x -= 1
+        elif event == RD or event == LU:
+            self.dir_x += 1
+        elif event == UU or event == DD:
+            self.dir_y -= 1
+        elif event == UD or event == DU:
+            self.dir_y += 1
 
     @staticmethod
     def exit(self):
@@ -100,50 +109,68 @@ class HIT:
         self.frame = (self.frame + 1) % 12
         if self.frame == 0:
             if self.dir_x == 0:
-                self.add_event(TIMER)
+                self.change_state(IDLE, HIT)
+                self.set_look()
             else:
-                self.add_event(TIMER)
+                self.change_state(RUN, HIT)
+                self.set_look()
+
     @staticmethod
     def draw(self):
         if self.look_at == 1:
             self.main_hit.clip_draw(0 + self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
                                     self.m_x, self.m_y + 20, self.hit_size[0] // 3, self.hit_size[1] // 3)
-        else:
+        elif self.look_at == -1:
             self.main_hit.clip_composite_draw(0 + self.frame * self.hit_size[0], 0,
                                               self.hit_size[0], self.hit_size[1],
                                               0, 'h', self.m_x, self.m_y + 20,
                                               self.hit_size[0] // 3, self.hit_size[1] // 3)
+
 class CLIMB:
     @staticmethod
     def enter(self, event):
-        if event == UD and self.m_y == 90:
+        if event == UD:
             self.dir_y += 1
-            if self.prev_state == CLIMB:
-                pass
-            elif self.box[0] > 300 - 70 and self.box[2] < 300 + 70:
+            if self.box[0] > 300 - 70 and self.box[2] < 300 + 70 and self.m_y == 90:
                 self.m_x = 280
                 self.m_y += 5
-            elif self.box[0] > 800 - 70 and self.box[2] < 800 + 70:
+            elif self.box[0] > 800 - 70 and self.box[2] < 800 + 70 and self.m_y == 90:
                 self.m_x = 780
                 self.m_y += 5
             else:
-                self.cur_state.exit(self)
-                self.cur_state = self.prev_state
-                self.cur_state.enter(self, None)
-        elif event == DD and self.m_y == 100:
-            pass
+                self.change_state(self.prev_state)
+
+        elif event == DD:
+            self.dir_y -= 1
+            print(self.dir_y)
+            if self.box[0] > 300 - 70 and self.box[2] < 300 + 70 and self.m_y == 300:
+                self.m_x = 280
+                self.m_y -= 5
+            elif self.box[0] > 800 - 70 and self.box[2] < 800 + 70 and self.m_y == 300:
+                self.m_x = 780
+                self.m_y -= 5
+            else:
+                self.change_state(self.prev_state)
+
         elif event == UU:
             self.dir_y -= 1
-            if self.box[0] > 300 - 70 and self.box[2] < 300 + 70:
-                pass
-            elif self.box[0] > 800 - 70 and self.box[2] < 800 + 70:
+            if self.prev_state == CLIMB:
                 pass
             else:
-                self.cur_state.exit(self)
-                self.cur_state = self.prev_state
-                self.cur_state.enter(self, None)
+                self.change_state(self.prev_state)
+
         elif event == DU:
-            pass
+            self.dir_y += 1
+            print(self.dir_y)
+            if self.prev_state == CLIMB:
+                pass
+            else:
+                self.change_state(self.prev_state)
+
+        elif event == LD or event == RU:
+            self.dir_x -= 1
+        elif event == RD or event == LU:
+            self.dir_x += 1
 
     @staticmethod
     def exit(self):
@@ -152,7 +179,31 @@ class CLIMB:
     @staticmethod
     def do(self):
         self.frame = (self.frame + 1) % 8
-        self.ladder_move()
+        self.m_y += self.dir_y * 5
+        if self.m_y > 300:
+            self.m_y = 300
+            if self.dir_x == 0:
+                self.change_state(IDLE, CLIMB)
+                self.set_look()
+
+            else:
+                self.change_state(RUN, CLIMB)
+                self.set_look()
+
+            if self.look_at == -1:
+                self.m_x += 35  # flip x좌표 이미지 보정
+        elif self.m_y < 90:
+            if self.dir_x == 0:
+                self.change_state(IDLE, CLIMB)
+                self.set_look()
+
+            else:
+                self.change_state(RUN, CLIMB)
+                self.set_look()
+
+            self.m_y = 90
+            if self.look_at == -1:
+                self.m_x += 35  # flip x좌표 이미지 보정
 
     @staticmethod
     def draw(self):
@@ -162,10 +213,9 @@ class CLIMB:
 next_state = {
     IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
     RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
-    HIT: {TIMER: IDLE, SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT},
+    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT},
     CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB}
 }
-
 
 class MainCharacter(Character):
     def __init__(self):
@@ -202,72 +252,17 @@ class MainCharacter(Character):
     def add_event(self, event):
         self.event_que.insert(0, event)
 
+    def change_state(self, next_state, prev_state = None):
+        self.cur_state.exit(self)
+        self.cur_state = next_state
+        if prev_state != None:
+            self.prev_state = prev_state
+        self.cur_state.enter(self, None)
+
     def handle_event(mainChar, event):
         if(event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
             mainChar.add_event(key_event)
-        # if event.type == SDL_KEYDOWN:
-        #     if event.key == SDLK_UP:
-        #         mainChar.dir_y += 1
-        #         if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
-        #             if mainChar.m_y == 90:
-        #                 mainChar.state = 2
-        #                 mainChar.m_x = 280
-        #                 mainChar.m_y += 5
-        #         elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
-        #             if mainChar.m_y == 90:
-        #                 mainChar.state = 2
-        #                 mainChar.m_x = 780
-        #                 mainChar.m_y += 5
-        #
-        #     elif event.key == SDLK_DOWN:
-        #         mainChar.dir_y -= 1
-        #         if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
-        #             if mainChar.m_y == 300:
-        #                 mainChar.state = 2
-        #                 mainChar.m_x = 280
-        #                 mainChar.m_y -= 5
-        #         elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
-        #             if mainChar.m_y == 300:
-        #                 mainChar.state = 2
-        #                 mainChar.m_x = 780
-        #                 mainChar.m_y -= 5
-        #     elif event.key == SDLK_RIGHT:
-        #         if mainChar.state != 2:
-        #             mainChar.state = 1
-        #         mainChar.dir_x += 1
-        #         if mainChar.dir_x == 0 and mainChar.state != 2:
-        #             mainChar.state = 0
-        #     elif event.key == SDLK_LEFT:
-        #         if mainChar.state != 2:
-        #             mainChar.state = 1
-        #         mainChar.dir_x -= 1
-        #         if mainChar.dir_x == 0 and mainChar.state != 2:
-        #             mainChar.state = 0
-        #     elif event.key == SDLK_SPACE and mainChar.state != 2:
-        #         mainChar.frame = 0
-        #         mainChar.state = 3
-        # elif event.type == SDL_KEYUP:
-
-        #     elif event.key == SDLK_DOWN:
-        #         mainChar.dir_y += 1
-        #     elif event.key == SDLK_RIGHT:
-        #         mainChar.dir_x -= 1
-        #         if mainChar.dir_x == 0 and mainChar.state != 2:
-        #             mainChar.state = 0
-        #         elif mainChar.state != 2:
-        #             mainChar.state = 1
-        #     elif event.key == SDLK_LEFT:
-        #         mainChar.dir_x += 1
-        #         if mainChar.dir_x == 0 and mainChar.state != 2:
-        #             mainChar.state = 0
-        #         elif mainChar.state != 2:
-        #             mainChar.state = 1
-
-        if mainChar.dir_x > 0:
-            mainChar.look_at = 1
-        elif mainChar.dir_x < 0:
-            mainChar.look_at = -1
 
     def update(self):
         self.get_now_resource()
@@ -298,27 +293,12 @@ class MainCharacter(Character):
         else:
             self.box = [self.m_x - self.idle_size[0] // 6, self.m_y, self.m_x, self.m_y - self.idle_size[1] // 3]
 
-
-
-    def ladder_move(self):
-        self.m_y += self.dir_y * 5
-        if self.m_y > 300:
-            self.m_y = 300
-            if self.dir_x == 0:
-                self.state = 0
-            else:
-                self.state = 1
-            if self.look_at == -1:
-                self.m_x += 35  # flip x좌표 이미지 보정
-        elif self.m_y < 90:
-            if self.dir_x == 0:
-                self.state = 0
-            else:
-                self.state = 1
-            self.m_y = 90
-            if self.look_at == -1:
-                self.m_x += 35  # flip x좌표 이미지 보정
-
     def get_now_resource(self):
         if self.now_resource < 300:
             self.now_resource += 1
+
+    def set_look(self):
+        if self.dir_x == 1:
+            self.look_at = 1
+        elif self.dir_x == -1:
+            self.look_at = - 1
