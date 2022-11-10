@@ -9,11 +9,20 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-SPD, RD, LD, RU, LU, UD, DD, UU, DU = range(9)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU = range(9)
 
 key_event_table = {
-
+    (SDLK_DOWN, SDLK_SPACE) : SPACE,
+    (SDL_KEYDOWN, SDLK_RIGHT): RD,
+    (SDL_KEYDOWN, SDLK_LEFT):LD,
+    (SDL_KEYDOWN, SDLK_UP): UD,
+    (SDL_KEYDOWN, SDLK_LEFT): DD,
+    (SDL_KEYUP, SDLK_RIGHT): RU,
+    (SDL_KEYUP, SDLK_LEFT): LU,
+    (SDL_KEYUP, SDLK_UP): UU,
+    (SDL_KEYUP, SDLK_LEFT): DU
 }
+
 
 class IDLE:
     @staticmethod
@@ -83,6 +92,14 @@ class CLIMB:
     def state_draw():
         pass
 
+next_state = {
+    IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
+    RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB},
+    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT},
+    CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB}
+}
+
+
 class MainCharacter(Character):
     def __init__(self):
         super().__init__(100, 90, 10)
@@ -110,8 +127,77 @@ class MainCharacter(Character):
             else:
                 self.look_at = -1
 
-    def handle_event(self, event):
+        self.event_que = []
+        self.cur_state = IDLE
+        self.cur_state.enter()
+
+    def add_event(self, event):
         pass
+
+    def handle_event(mainChar, event):
+        if event.type == SDL_KEYDOWN:
+            if event.key == SDLK_UP:
+                mainChar.dir_y += 1
+                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
+                    if mainChar.m_y == 90:
+                        mainChar.state = 2
+                        mainChar.m_x = 280
+                        mainChar.m_y += 5
+                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
+                    if mainChar.m_y == 90:
+                        mainChar.state = 2
+                        mainChar.m_x = 780
+                        mainChar.m_y += 5
+
+            elif event.key == SDLK_DOWN:
+                mainChar.dir_y -= 1
+                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
+                    if mainChar.m_y == 300:
+                        mainChar.state = 2
+                        mainChar.m_x = 280
+                        mainChar.m_y -= 5
+                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
+                    if mainChar.m_y == 300:
+                        mainChar.state = 2
+                        mainChar.m_x = 780
+                        mainChar.m_y -= 5
+            elif event.key == SDLK_RIGHT:
+                if mainChar.state != 2:
+                    mainChar.state = 1
+                mainChar.dir_x += 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+            elif event.key == SDLK_LEFT:
+                if mainChar.state != 2:
+                    mainChar.state = 1
+                mainChar.dir_x -= 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+            elif event.key == SDLK_SPACE and mainChar.state != 2:
+                mainChar.frame = 0
+                mainChar.state = 3
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_UP:
+                mainChar.dir_y -= 1
+            elif event.key == SDLK_DOWN:
+                mainChar.dir_y += 1
+            elif event.key == SDLK_RIGHT:
+                mainChar.dir_x -= 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+                elif mainChar.state != 2:
+                    mainChar.state = 1
+            elif event.key == SDLK_LEFT:
+                mainChar.dir_x += 1
+                if mainChar.dir_x == 0 and mainChar.state != 2:
+                    mainChar.state = 0
+                elif mainChar.state != 2:
+                    mainChar.state = 1
+
+        if mainChar.dir_x > 0:
+            mainChar.look_at = 1
+        elif mainChar.dir_x < 0:
+            mainChar.look_at = -1
 
     def idle(self):
         self.main_idle.clip_draw(0 + self.frame * self.idle_size[0], 0, self.idle_size[0], self.idle_size[1],

@@ -31,83 +31,25 @@ def handle_events():
     global warrior
     events = get_events()
     for event in events:
-        if event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                game_framework.quit()
-            elif event.key == SDLK_q:
-                for war in warrior:
-                    war.state = -1
-            elif event.key == SDLK_w:
-                for ewar in e_warrior:
-                    ewar.state = -1
-            elif event.key == SDLK_UP:
-                mainChar.dir_y += 1
-                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
-                    if mainChar.m_y == 90:
-                        mainChar.state = 2
-                        mainChar.m_x = 280
-                        mainChar.m_y += 5
-                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
-                    if mainChar.m_y == 90:
-                        mainChar.state = 2
-                        mainChar.m_x = 780
-                        mainChar.m_y += 5
-            elif event.key == SDLK_DOWN:
-                mainChar.dir_y -= 1
-                if (mainChar.box[0] > 300 - 70 and mainChar.box[2] < 300 + 70):
-                    if mainChar.m_y == 300:
-                        mainChar.state = 2
-                        mainChar.m_x = 280
-                        mainChar.m_y -= 5
-                elif (mainChar.box[0] > 800 - 70 and mainChar.box[2] < 800 + 70):
-                    if mainChar.m_y == 300:
-                        mainChar.state = 2
-                        mainChar.m_x = 780
-                        mainChar.m_y -= 5
-            elif event.key == SDLK_RIGHT:
-                if mainChar.state != 2:
-                    mainChar.state = 1
-                mainChar.dir_x += 1
-                if mainChar.dir_x == 0 and mainChar.state != 2:
-                    mainChar.state = 0
-            elif event.key == SDLK_LEFT:
-                if mainChar.state != 2:
-                    mainChar.state = 1
-                mainChar.dir_x -= 1
-                if mainChar.dir_x == 0 and mainChar.state != 2:
-                    mainChar.state = 0
-            elif event.key == SDLK_SPACE and mainChar.state != 2:
-                mainChar.frame = 0
-                mainChar.state = 3
-            elif event.key == SDLK_1 and mainChar.now_resource >= 100:
-                mainChar.now_resource -= 100
-                warrior.append(Warrior(1))
-            elif event.key == SDLK_5 and mainChar.now_resource >= 100:
-                mainChar.now_resource -= 100
-                warrior.append(Warrior(5))
+        if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            game_framework.quit()
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
+            for war in warrior:
+                war.state = -1
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_w:
+            for ewar in e_warrior:
+                ewar.state = -1
+        else:
+            mainChar.handle_event(event)
+            # 아군 추가 구현
+            # elif event.key == SDLK_1 and mainChar.now_resource >= 100:
+            #     mainChar.now_resource -= 100
+            #     warrior.append(Warrior(1))
+            # elif event.key == SDLK_5 and mainChar.now_resource >= 100:
+            #     mainChar.now_resource -= 100
+            #     warrior.append(Warrior(5))
 
-        elif event.type == SDL_KEYUP:
-            if event.key == SDLK_UP:
-                mainChar.dir_y -= 1
-            elif event.key == SDLK_DOWN:
-                mainChar.dir_y += 1
-            elif event.key == SDLK_RIGHT:
-                mainChar.dir_x -= 1
-                if mainChar.dir_x == 0 and mainChar.state != 2:
-                    mainChar.state = 0
-                elif mainChar.state != 2:
-                    mainChar.state = 1
-            elif event.key == SDLK_LEFT:
-                mainChar.dir_x += 1
-                if mainChar.dir_x == 0 and mainChar.state != 2:
-                    mainChar.state = 0
-                elif mainChar.state != 2:
-                    mainChar.state = 1
 
-        if mainChar.dir_x > 0:
-            mainChar.look_at = 1
-        elif mainChar.dir_x < 0:
-            mainChar.look_at = -1
 
 # 초기화
 def enter():
