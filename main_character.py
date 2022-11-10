@@ -118,7 +118,9 @@ class CLIMB:
     def enter(self, event):
         if event == UD and self.m_y == 90:
             self.dir_y += 1
-            if self.box[0] > 300 - 70 and self.box[2] < 300 + 70:
+            if self.prev_state == CLIMB:
+                pass
+            elif self.box[0] > 300 - 70 and self.box[2] < 300 + 70:
                 self.m_x = 280
                 self.m_y += 5
             elif self.box[0] > 800 - 70 and self.box[2] < 800 + 70:
@@ -146,11 +148,11 @@ class CLIMB:
     @staticmethod
     def exit(self):
         self.frame = 0
-        self.ladder_move()
 
     @staticmethod
     def do(self):
         self.frame = (self.frame + 1) % 8
+        self.ladder_move()
 
     @staticmethod
     def draw(self):
