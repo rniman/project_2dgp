@@ -26,6 +26,8 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
+from  warrior import DEAD
+
 def handle_events():
     global mainChar
     global warrior
@@ -35,7 +37,8 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
             for war in game_world.game_object[2]:
-                war.state = -1
+                war.cur_state = DEAD
+                war.cur_state.enter(war)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_w:
             for ewar in game_world.game_object[1]:
                 ewar.state = -1

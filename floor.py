@@ -2,7 +2,6 @@ from pico2d import *
 
 width = 1280
 
-
 class Floor:
     def __init__(self):
         self.floor = load_image('image/tile.png')

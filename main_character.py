@@ -256,8 +256,7 @@ class MainCharacter(Character):
         self.dir_y = logo_state.dir_y
         self.look_at = 1
         if self.dir_x != 0:
-            self.state = 1
-            if self.dir_x > 0:
+            if self.dir_x >= 0:
                 self.look_at = 1
             else:
                 self.look_at = -1
