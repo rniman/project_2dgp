@@ -29,9 +29,10 @@ class IDLE:
             self.cur_state.enter(self)
 
     @staticmethod
+
     def draw(self):
-        self.warrior_idle.clip_composite_draw(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
-                                              0, 'h', self.m_x + 35, self.m_y - 20, self.idle_size[0], self.idle_size[1])
+        self.idle.clip_draw_to_origin(self.idle_size[0] * self.frame, 0, self.idle_size[0], self.idle_size[1],
+                                      self.m_x + 50, self.m_y)
 
 class RUN:
     @staticmethod
@@ -49,8 +50,8 @@ class RUN:
         self.m_x += self.dir_x * 5
         if self.cool_time > 0:
             self.cool_time -= 1
-        if self.m_x > 1200:
-            self.m_x = 1200
+        if self.m_x > 1150:
+            self.m_x = 1150
 
         if self.check_enemy():
             self.cur_state.exit(self)
@@ -62,8 +63,8 @@ class RUN:
 
     @staticmethod
     def draw(self):
-        self.warrior_run.clip_composite_draw(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
-                                             0, 'h', self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+        self.run.clip_draw_to_origin(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
+                                     self.m_x, self.m_y)
 
 
 class HIT:
@@ -71,7 +72,6 @@ class HIT:
     def enter(self):
         self.dir_x = 0
         self.frame = 0
-        pass
 
     @staticmethod
     def exit(self):
@@ -91,8 +91,8 @@ class HIT:
 
     @staticmethod
     def draw(self):
-        self.warrior_hit.clip_composite_draw(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
-                                             0, 'h', self.m_x + 17, self.m_y + 15, self.hit_size[0], self.hit_size[1])
+        self.hit.clip_draw_to_origin(self.hit_size[0] * self.frame, 0, self.hit_size[0], self.hit_size[1],
+                                     self.m_x, self.m_y)
 
 
 class DEAD:
@@ -113,33 +113,37 @@ class DEAD:
 
     @staticmethod
     def draw(self):
-        self.warrior_death.clip_composite_draw(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
-                                               0, 'h', self.m_x, self.m_y, self.death_size[0], self.death_size[1])
+        self.death.clip_draw_to_origin(self.death_size[0] * self.frame, 0, self.death_size[0], self.death_size[1],
+                                       self.m_x, self.m_y - 20)
 
+
+# 히트박스 120, 110
+# 충돌지점 -> m_x + 120
 class Warrior(NPC):
-    warrior_idle = None
-    warrior_run = None
-    warrior_hit = None
-    warrior_death = None
-    idle_size = (121, 106)
+    idle = None
+    run = None
+    hit = None
+    death = None
+    idle_size = (122, 106)
     run_size = (131, 158)
     hit_size = (198, 175)
     death_size = (187, 175)
     def __init__(self, i_key):
         # 1층 115  2층 325
         if i_key == 1:
-            super().__init__(90, 115, 5, 50)
+            super().__init__(0, 40, 5, 50)
         elif i_key == 5:
-            super().__init__(90, 325, 5, 50)
+            super().__init__(0, 250, 5, 50)
 
-        if Warrior.warrior_idle == None:
-            self.warrior_idle = load_image('image/warrior_idle.png')
-            self.warrior_run = load_image('image/warrior_run.png')
-            self.warrior_hit = load_image('image/warrior_hit.png')
-            self.warrior_death = load_image('image/warrior_death.png')
+        if Warrior.idle == None:
+            self.idle = load_image('image/warrior_idle.png')
+            self.run = load_image('image/warrior_run.png')
+            self.hit = load_image('image/warrior_hit.png')
+            self.death = load_image('image/warrior_death.png')
+
+        self.hit_box = None
 
         self.cur_state = RUN
-        # self.prev_state = None
         self.cur_state.enter(self)
 
     def update(self):
@@ -150,7 +154,7 @@ class Warrior(NPC):
 
     def check_enemy(self):
         for enemy in game_object[1]:
-            if self.m_x + 50 > enemy.m_x:
+            if self.m_x + 120 > enemy.m_x:
                 return True
         return False
 

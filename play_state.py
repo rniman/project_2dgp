@@ -1,11 +1,4 @@
-back_ground = None
-ladder = None
-floor = None
-castle = None
-mainChar = None
-warrior = None
-e_warrior = None
-time = 0
+
 
 from pico2d import *
 import game_framework
@@ -17,7 +10,9 @@ from back_ground import BackGround
 from floor import Floor
 from ladder import Ladder
 from main_character import MainCharacter
-from enemy_warrior import EnemyWarrior
+
+import warrior
+import enemy_warrior
 
 width = 1280
 height = 720
@@ -26,30 +21,36 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-from  warrior import DEAD
-
 def handle_events():
     global mainChar
-    global warrior
     events = get_events()
     for event in events:
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
             for war in game_world.game_object[2]:
-                war.cur_state = DEAD
+                war.cur_state.exit(war)
+                war.cur_state = warrior.DEAD
                 war.cur_state.enter(war)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_w:
-            for ewar in game_world.game_object[1]:
-                ewar.state = -1
+            for war in game_world.game_object[1]:
+                war.cur_state.exit(war)
+                war.cur_state = enemy_warrior.DEAD
+                war.cur_state.enter(war)
         else:
             mainChar.handle_event(event)
+
+back_ground = None
+ladder = None
+floor = None
+castle = None
+mainChar = None
+time = 0
 
 # 초기화
 def enter():
     global back_ground, ladder, floor
     global castle
-    global warrior, e_warrior
     global mainChar
     back_ground = BackGround()
     ladder = Ladder()
@@ -76,8 +77,8 @@ def update():
     global time
     time += 1
     if time % 100 == 0:
-        enemy_warrior = EnemyWarrior()
-        game_world.add_object(enemy_warrior, 1)
+        ewarrior = enemy_warrior.EnemyWarrior()
+        game_world.add_object(ewarrior, 1)
     delay(0.03)
 
 def draw_world():
