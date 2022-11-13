@@ -4,8 +4,6 @@ import game_framework
 import play_state
 
 image = None
-dir_x = None
-dir_y = None
 logo_Time = 0.0
 
 def enter():
@@ -19,14 +17,13 @@ def exit():
     del image
 
 def update():
-    pass
     # logo time을 계산하고 1초가 넘으면 running을 false로
-    global logo_Time  # ,  running
+    global logo_Time, running
     delay(0.01)
     logo_Time += 0.01
-    if logo_Time >= 0.0: # 로고타임off
+    if logo_Time >= 1.0: # 로고타임off
         logo_Time = 0.0
-        # running = False
+        running = False
         game_framework.change_state(play_state)
 
 def draw():
@@ -36,27 +33,7 @@ def draw():
 
 
 def handle_events():
-    events = get_events()
-    global dir_x, dir_y
-    for event in events:
-        if event.type == SDL_KEYDOWN:
-            if event.key == SDLK_UP:
-                dir_y += 1
-            elif event.key == SDLK_DOWN:
-                dir_y -= 1
-            elif event.key == SDLK_RIGHT:
-                dir_x += 1
-            elif event.key == SDLK_LEFT:
-                dir_x -= 1
-        elif event.type == SDL_KEYUP:
-            if event.key == SDLK_UP:
-                dir_y -= 1
-            elif event.key == SDLK_DOWN:
-                dir_y += 1
-            elif event.key == SDLK_RIGHT:
-                dir_x -= 1
-            elif event.key == SDLK_LEFT:
-                dir_x += 1
+    pass
 
 
 

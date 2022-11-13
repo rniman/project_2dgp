@@ -62,7 +62,7 @@ class RUN:
     @staticmethod
     def draw(self):
         self.warrior_run.clip_draw_to_origin(self.run_size[0] * self.frame, 0, self.run_size[0], self.run_size[1],
-                                            self.m_x, self.m_y, self.run_size[0], self.run_size[1])
+                                            self.m_x, self.m_y)
 
 
 class HIT:
