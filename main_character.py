@@ -2,6 +2,7 @@ from pico2d import *
 from character import Character
 from warrior import Warrior
 import game_world
+import game_framework
 
 width = 1280
 height = 720
@@ -26,6 +27,25 @@ key_event_table = {
     (SDL_KEYUP, SDLK_DOWN): DU
 }
 
+#RUN SPEED
+PIXEL_PER_METER = 10.0 / 0.1 # 10픽셀당 10cm
+
+RUN_SPEED_KMPH = 10.0
+RUN_SPEED_MPH = RUN_SPEED_KMPH * 1000.0 / 60.0
+RUN_SPEED_MPS = RUN_SPEED_MPH / 60.0
+RUN_SPEED_PPS = RUN_SPEED_MPS * PIXEL_PER_METER
+
+CLIMB_SPEED_KMPH = 5.0
+CLIMB_SPEED_MPH = CLIMB_SPEED_KMPH * 1000.0 / 60.0
+CLIMB_SPEED_MPS = CLIMB_SPEED_MPH / 60.0
+CLIMB_SPEED_PPS = CLIMB_SPEED_MPS * PIXEL_PER_METER
+
+TIME_PER_ACTION = 0.4
+TIME_PER_HIT = 0.3
+ACTION_PER_TIME = 1.0/TIME_PER_ACTION
+HIT_PER_TIME = 1.0/TIME_PER_HIT
+FRAMES_PER_ACTION = 8
+FRAMES_PER_HIT = 12
 
 class IDLE:
     @staticmethod
@@ -39,21 +59,21 @@ class IDLE:
             self.summon(event)
         elif event == KEY5:
             self.summon(event)
-        else:
-            self.frame = 0
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + 1) % 8
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
     @staticmethod
     def draw(self):
         if self.look_at == 1:
-            self.idle.clip_draw_to_origin(self.frame * self.idle_size[0], 0,self.idle_size[0], self.idle_size[1],
-                                     self.m_x, self.m_y)
+            self.idle.clip_draw_to_origin(int(self.frame) * self.idle_size[0], 0,
+                                          self.idle_size[0], self.idle_size[1],
+                                          self.m_x, self.m_y)
         else:
-            self.composite_idle.clip_draw_to_origin(self.frame * self.idle_size[0], 0,self.idle_size[0], self.idle_size[1],
-                                     self.m_x, self.m_y)
+            self.composite_idle.clip_draw_to_origin(int(self.frame) * self.idle_size[0], 0,
+                                                    self.idle_size[0], self.idle_size[1],
+                                                    self.m_x, self.m_y)
 
 class RUN:
     @staticmethod
@@ -90,9 +110,9 @@ class RUN:
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + 1) % 8
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
-        self.m_x += self.dir_x * 5
+        self.m_x += self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
         if self.m_x > 1150:
             self.m_x = 1150
         elif self.m_x < 50:
@@ -102,11 +122,13 @@ class RUN:
     @staticmethod
     def draw(self):
         if self.look_at == 1:
-            self.run.clip_draw_to_origin(self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
-                                    self.m_x, self.m_y)
+            self.run.clip_draw_to_origin(int(self.frame) * self.run_size[0], 0,
+                                         self.run_size[0], self.run_size[1],
+                                         self.m_x, self.m_y)
         else:
-            self.composite_run.clip_draw_to_origin(self.frame * self.run_size[0], 0, self.run_size[0], self.run_size[1],
-                                    self.m_x, self.m_y)
+            self.composite_run.clip_draw_to_origin(int(self.frame) * self.run_size[0], 0,
+                                                   self.run_size[0], self.run_size[1],
+                                                   self.m_x, self.m_y)
 
 class HIT:
     @staticmethod
@@ -131,8 +153,8 @@ class HIT:
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + 1) % 12
-        if self.frame == 0:
+        self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
+        if int(self.frame) == 0:
             if self.dir_x == 0:
                 self.change_state(IDLE, HIT)
                 self.set_look()
@@ -143,11 +165,13 @@ class HIT:
     @staticmethod
     def draw(self):
         if self.look_at == 1:
-            self.hit.clip_draw_to_origin(self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
-                                    self.m_x - 10, self.m_y)
+            self.hit.clip_draw_to_origin(int(self.frame) * self.hit_size[0], 0,
+                                         self.hit_size[0], self.hit_size[1],
+                                         self.m_x - 10, self.m_y)
         elif self.look_at == -1:
-            self.composite_hit.clip_draw_to_origin(self.frame * self.hit_size[0], 0, self.hit_size[0], self.hit_size[1],
-                                    self.m_x - 80, self.m_y)
+            self.composite_hit.clip_draw_to_origin(int(self.frame) * self.hit_size[0], 0,
+                                                   self.hit_size[0], self.hit_size[1],
+                                                   self.m_x - 80, self.m_y)
 
 class CLIMB:
     @staticmethod
@@ -213,8 +237,8 @@ class CLIMB:
 
     @staticmethod
     def do(self):
-        self.frame = (self.frame + 1) % 8
-        self.m_y += self.dir_y * 5
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        self.m_y += self.dir_y * CLIMB_SPEED_PPS * game_framework.frame_time
         if self.m_y > 250:
             self.m_y = 250
             if self.dir_x == 0:
@@ -244,8 +268,9 @@ class CLIMB:
 
     @staticmethod
     def draw(self):
-        self.climb.clip_draw_to_origin(self.frame * self.climb_size[0], 0, self.climb_size[0], self.climb_size[1],
-                                  self.m_x, self.m_y)
+        self.climb.clip_draw_to_origin(int(self.frame) * self.climb_size[0], 0,
+                                       self.climb_size[0], self.climb_size[1],
+                                       self.m_x, self.m_y)
 
 next_state = {
     IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: IDLE,  KEY5: IDLE},
