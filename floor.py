@@ -14,3 +14,12 @@ class Floor:
         for x in range(98, width, self.tile_width):
             self.floor.draw(x, 245)
             x = x + self.tile_width
+
+    def get_bounding_box(self):
+        return 0, 235, 1280 - 1, 255
+
+    def collide(self, other, group):
+        pass
+
+    def no_collide(self, other, group):
+        pass

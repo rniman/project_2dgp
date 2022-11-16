@@ -3,6 +3,7 @@ from character import Character
 from warrior import Warrior
 import game_world
 import game_framework
+import ladder
 
 width = 1280
 height = 720
@@ -113,11 +114,11 @@ class RUN:
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
 
         self.m_x += self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
-        if self.m_x > 1150:
-            self.m_x = 1150
-        elif self.m_x < 50:
-            self.m_x = 50
-        self.set_box()
+        self.m_x = clamp(40, self.m_x, 1160)
+        # if self.m_x > 1150:
+        #     self.m_x = 1150
+        # elif self.m_x < 50:
+        #     self.m_x = 50
 
     @staticmethod
     def draw(self):
@@ -135,6 +136,7 @@ class HIT:
     def enter(self, event):
         if event == SPACE and self.prev_state != HIT:
             self.frame = 0
+            self.do_hit = False
         elif event == LD or event == RU:
             self.dir_x -= 1
         elif event == RD or event == LU:
@@ -155,6 +157,21 @@ class HIT:
     def do(self):
         oldFrame = self.frame
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
+
+        if self.frame > 8 and self.do_hit == False:
+            a = 0
+            for enemy in game_world.game_object[1]:
+                if self.get_hit_bb()[0] > enemy.get_bounding_box()[2]:
+                    continue
+                if self.get_hit_bb()[2] < enemy.get_bounding_box()[0]:
+                    continue
+                if self.get_hit_bb()[1] > enemy.get_bounding_box()[3]:
+                    continue
+                if self.get_hit_bb()[3] < enemy.get_bounding_box()[1]:
+                    continue
+                enemy.take_damage(self.give_damage())
+            self.do_hit = True
+
         if int(oldFrame) >= 10 and int(self.frame) <= 4:
             if self.dir_x == 0:
                 self.change_state(IDLE, HIT)
@@ -181,28 +198,47 @@ class CLIMB:
             if self.dir_y == None:
                 self.dir_y = 0
             self.dir_y += 1
-            if (self.box[0] + self.box[2]) / 2 <= 335 and (self.box[0] + self.box[2]) / 2 >= 265 and self.m_y == 40:
-                self.m_x = 300 - 80
-                self.m_y += 5
-            elif (self.box[0] + self.box[2]) / 2 <= 835 and (self.box[0] + self.box[2]) / 2 >= 765 and self.m_y == 40:
-                self.m_x = 800 - 80
-                self.m_y += 5
-            else:
+
+            box = self.get_bounding_box()
+            if box[0] > 335 and box[2] < 765:
                 self.change_state(self.prev_state)
+                return
+            if box[2] < 265 or box[0] > 835:
+                self.change_state(self.prev_state)
+                return
+            if box[1] != 40:
+                self.change_state(self.prev_state)
+                return
+
+            if self.m_y == 40:
+                self.m_y += 5
+                if self.m_x < 500:
+                    self.m_x = 220
+                else:
+                    self.m_x = 720
 
         elif event == DD:
             if self.dir_y == None:
                 self.dir_y = 0
             self.dir_y -= 1
-            print(self.dir_y)
-            if (self.box[0] + self.box[2]) / 2 <= 335 and (self.box[0] + self.box[2]) / 2 >= 265 and self.m_y == 250:
-                self.m_x = 300 - 80
-                self.m_y -= 5
-            elif (self.box[0] + self.box[2]) / 2 <= 835 and (self.box[0] + self.box[2]) / 2 >= 765 and self.m_y == 250:
-                self.m_x = 800 - 80
-                self.m_y -= 5
-            else:
+
+            box = self.get_bounding_box()
+            if box[0] > 335 and box[2] < 765:
                 self.change_state(self.prev_state)
+                return
+            if box[2] < 265 or box[0] > 835:
+                self.change_state(self.prev_state)
+                return
+            if box[1] != 250:
+                self.change_state(self.prev_state)
+                return
+
+            if self.m_y == 250:
+                self.m_y -= 5
+                if self.m_x < 500:
+                    self.m_x = 220
+                else:
+                    self.m_x = 720
 
         elif event == UU and self.dir_y != None:
             self.dir_y -= 1
@@ -210,6 +246,7 @@ class CLIMB:
                 pass
             else:
                 self.change_state(self.prev_state)
+                return
 
         elif event == DU and self.dir_y != None:
             self.dir_y += 1
@@ -218,10 +255,12 @@ class CLIMB:
                 pass
             else:
                 self.change_state(self.prev_state)
+                return
 
         elif event == UU or event == DU:
             self.dir_y = 0
             self.change_state(IDLE, None)
+            return
 
         elif event == LD or event == RU:
             self.dir_x -= 1
@@ -242,30 +281,33 @@ class CLIMB:
         self.m_y += self.dir_y * CLIMB_SPEED_PPS * game_framework.frame_time
         if self.m_y > 250:
             self.m_y = 250
+            if self.look_at == -1:
+                self.m_x += 40  # flip x좌표 이미지 보정
+
             if self.dir_x == 0:
                 self.change_state(IDLE, CLIMB)
                 self.set_look()
+                return
             else:
                 self.change_state(RUN, CLIMB)
                 self.set_look()
-
-            if self.look_at == -1:
-                self.m_x += 40  # flip x좌표 이미지 보정
+                return
 
         elif self.m_y < 40:
             self.m_y = 40
-            if self.dir_x == 0:
-                self.change_state(IDLE, CLIMB)
-                self.set_look()
-
-            else:
-                self.change_state(RUN, CLIMB)
-                self.set_look()
-
             if self.look_at == -1:
                 self.m_x += 40  # flip x좌표 이미지 보정
 
-        self.set_box()
+            if self.dir_x == 0:
+                self.change_state(IDLE, CLIMB)
+                self.set_look()
+                return
+            else:
+                self.change_state(RUN, CLIMB)
+                self.set_look()
+                return
+
+
 
     @staticmethod
     def draw(self):
@@ -281,10 +323,18 @@ next_state = {
 }
 
 
-# [130, 100] 크기 판정
 # 1층 y좌표 40, 2층 y좌표 250
 # 10km/h의 이동속도
 # 자원은 초당 1씩오르며 최대 10까지 보관가능
+#
+# 바운딩 박스
+# if self.cur_state == CLIMB:
+#    self.m_x + 50, self.m_y, self.m_x + 110, self.m_y + 100
+# if self.look_at == 1:
+#    return self.m_x + 50, self.m_y, self.m_x + 120, self.m_y + 100
+# else:
+#    return self.m_x, self.m_y, self.m_x + 70, self.m_y + 100
+# 히트 사이즈 70
 class MainCharacter(Character):
     def __init__(self):
         super().__init__(50, 40, 10)
@@ -303,7 +353,6 @@ class MainCharacter(Character):
         self.run_size = (143, 110)
         self.climb_size = (125, 87)
         self.hit_size = (216, 168)
-        self.box = [self.m_x, self.m_y, self.m_x + 130, self.m_y + 100]
 
         self.now_resource = 3.0
         self.max_resource = 10.0
@@ -311,6 +360,7 @@ class MainCharacter(Character):
         self.dir_x = None
         self.dir_y = None
         self.look_at = 1
+        self.can_climb = False
 
         self.event_que = []
         self.cur_state = IDLE
@@ -355,12 +405,8 @@ class MainCharacter(Character):
                                           int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
-
-    def set_box(self):
-        if self.look_at == 1:
-            self.box = [self.m_x, self.m_y, self.m_x + 130, self.m_y + 100]
-        else:
-            self.box = [self.m_x, self.m_y, self.m_x + 130, self.m_y + 100]
+        draw_rectangle(*self.get_bounding_box())
+        draw_rectangle(*self.get_hit_bb())
 
     def get_now_resource(self):
         if self.now_resource < 10.0:
@@ -378,8 +424,35 @@ class MainCharacter(Character):
             self.now_resource -= 3.0
             warrior = Warrior(1)
             game_world.add_object(warrior, 2)
+            game_world.add_collision_pairs(warrior, None, 'war:eWar')
         elif event == KEY5 and self.now_resource >= 3.0:
             self.now_resource -= 3.0
             warrior = Warrior(2)
             game_world.add_object(warrior, 2)
+            game_world.add_collision_pairs(warrior, None, 'war:eWar')
 
+    def get_bounding_box(self):
+        if self.cur_state == CLIMB:
+            return self.m_x + 50, self.m_y, self.m_x + 110, self.m_y + 100
+        if self.look_at == 1:
+            return self.m_x + 50, self.m_y, self.m_x + 120, self.m_y + 100
+        else:
+            return self.m_x, self.m_y, self.m_x + 70, self.m_y + 100
+
+    def get_hit_bb(self):
+        if self.look_at == 1:
+            return self.m_x + 120, self.m_y, self.m_x + 190, self.m_y + 100
+        else:
+            return self.m_x - 70, self.m_y, self.m_x, self.m_y + 100
+
+    def collide(self, other, group):
+        pass
+
+    def no_collide(self, other, group):
+        pass
+
+    def take_damage(self, damage):
+        pass
+
+    def give_damage(self):
+        return self.attack_damage

@@ -1,13 +1,25 @@
 from pico2d import *
 
 class Ladder:
-    def __init__(self):
-        self.ladder = load_image('image/ladder.png')
-        self.mx = (300, 800)
+    ladder = None
+
+    def __init__(self, i_x):
+        if Ladder.ladder == None:
+            self.ladder = load_image('image/ladder.png')
+        self.mx = i_x
 
     def update(self):
         pass
 
     def draw(self):
-        self.ladder.draw(self.mx[0], 160)
-        self.ladder.draw(self.mx[1], 160)
+        self.ladder.draw(self.mx, 160)
+        # draw_rectangle(*self.get_bounding_box())
+
+    def get_bounding_box(self):
+        return self.mx - 35, 160 - 175/2, self.mx + 35, 160 + 175/2
+
+    def collide(self, other, group):
+        pass
+
+    def no_collide(self, other, group):
+        pass

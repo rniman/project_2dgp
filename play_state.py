@@ -52,17 +52,18 @@ def enter():
     global castle
     global mainChar
     back_ground = BackGround()
-    ladder = Ladder()
+    ladder = [Ladder(300), Ladder(800)]
     floor = Floor()
     castle = Castle()
 
     game_world.add_object(back_ground, 0)
-    game_world.add_object(ladder, 0)
+    game_world.add_objects(ladder, 0)
     game_world.add_object(floor, 0)
     game_world.add_object(castle, 0)
 
     mainChar = MainCharacter()
     game_world.add_object(mainChar, 3)
+
 
 # 종료
 def exit():
@@ -79,8 +80,18 @@ def update():
     if state_time >= 5.0:
         ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
         game_world.add_object(ewarrior, 1)
+        game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
         state_time = 0.0
-    delay(0.03)
+
+    for fir, sec, group in game_world.all_collision_pairs():
+        if collide(fir, sec):
+            fir.collide(sec, group)
+            sec.collide(fir, group)
+        # else:
+        #     fir.no_collide(sec, group)
+        #     sec.no_collide(fir, group)
+
+    # delay(0.03)
 
 def draw_world():
     for game_object in game_world.all_objects():
@@ -94,6 +105,15 @@ def draw():
     update_canvas()
 
 
+def collide(first, second):
+    left_fir, bottom_fir, right_fir, top_fir = first.get_bounding_box()
+    left_sec, bottom_sec, right_sec, top_sec = second.get_bounding_box()
 
+    if left_fir > right_sec: return False
+    if right_fir < left_sec: return False
+    if top_fir < bottom_sec: return False
+    if bottom_fir > top_sec: return False
+
+    return True
 
 

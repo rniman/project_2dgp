@@ -6,3 +6,4 @@ class Character:
         self.m_y = i_y
         self.dir_x = 0
         self.attack_damage = i_attack
+        self.do_hit = False

@@ -68,15 +68,14 @@ class RUN:
             self.cool_time -= game_framework.frame_time
         if self.m_x < 50:
             self.m_x = 50
-            print(self.m_x)
 
-        if self.check_enemy():
-            self.cur_state.exit(self)
-            if self.cool_time <= 0.0:
-                self.cur_state = HIT
-            else:
-                self.cur_state = IDLE
-            self.cur_state.enter(self)
+        # if self.check_enemy():
+        #     self.cur_state.exit(self)
+        #     if self.cool_time <= 0.0:
+        #         self.cur_state = HIT
+        #     else:
+        #         self.cur_state = IDLE
+        #     self.cur_state.enter(self)
 
     @staticmethod
     def draw(self):
@@ -89,6 +88,7 @@ class HIT:
     def enter(self):
         self.dir_x = 0
         self.frame = 0
+        self.do_hit = False
 
     @staticmethod
     def exit(self):
@@ -98,6 +98,12 @@ class HIT:
     def do(self):
         oldFrame = self.frame
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
+        if self.frame > 6 and self.do_hit == False:
+            for enemy in game_object[2]:
+                if self.get_hit_bb()[0] < enemy.get_bounding_box()[2] and enemy.layer == self.layer:
+                    enemy.take_damage(self.give_damage())
+            self.do_hit = True
+
         if int(oldFrame) >= 10 and int(self.frame) <= 3:
             self.cool_time = 2.5
             self.cur_state.exit(self)
@@ -134,10 +140,11 @@ class DEAD:
         self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
                                        self.m_x, self.m_y)
 
-# 히트박스 120, 110
+# 히트박스 80, 110
 # 충돌 지점 self.m_x - 120
 # 5km/h의 이동 속도
 # 공격 쿨타임 2.5초
+# 히트 사이즈 70 -> 실제 히트 30
 class EnemyWarrior(NPC):
     idle = None
     warrior_run = None
@@ -149,7 +156,7 @@ class EnemyWarrior(NPC):
     death_size = (195, 149)
     def __init__(self, i_layer):
         if i_layer == 1:
-            super().__init__(1200, 40, 10, 70, i_layer)
+            super().__init__(1200, 30, 10, 70, i_layer)
         else:
             super().__init__(1200, 240, 10, 70, i_layer)
 
@@ -164,15 +171,40 @@ class EnemyWarrior(NPC):
 
     def update(self):
         self.cur_state.do(self)
+        print(self.health_point)
 
     def draw(self):
         self.cur_state.draw(self)
+        # draw_rectangle(*self.get_bounding_box())
+        # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):
         if self.m_x == 50:
             return True
         for enemy in game_object[2]:
-            if self.m_x - 120 < enemy.m_x and enemy.layer == self.layer:
+            if self.get_bounding_box()[0] < enemy.get_bounding_box()[2] and enemy.layer == self.layer:
                 return True
         return False
 
+    def get_bounding_box(self):
+        return self.m_x + 40, self.m_y, self.m_x + 120, self.m_y + 110
+
+    def get_hit_bb(self):
+        return self.m_x + 10, self.m_y, self.m_x + 80, self.m_y + 110
+
+    def collide(self, other, group):
+        if group != 'war:eWar':
+            return
+        if self.cur_state == RUN:
+            self.cur_state.exit(self)
+            if self.cool_time <= 0.0:
+                self.cur_state = HIT
+            else:
+                self.cur_state = IDLE
+            self.cur_state.enter(self)
+
+    def take_damage(self, damage):
+        self.health_point -= damage
+
+    def give_damage(self):
+        return self.attack_damage
