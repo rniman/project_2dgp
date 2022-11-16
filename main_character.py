@@ -283,6 +283,8 @@ next_state = {
 
 # [130, 100] 크기 판정
 # 1층 y좌표 40, 2층 y좌표 250
+# 10km/h의 이동속도
+# 자원은 초당 1씩오르며 최대 10까지 보관가능
 class MainCharacter(Character):
     def __init__(self):
         super().__init__(50, 40, 10)
@@ -303,8 +305,8 @@ class MainCharacter(Character):
         self.hit_size = (216, 168)
         self.box = [self.m_x, self.m_y, self.m_x + 130, self.m_y + 100]
 
-        self.now_resource = 100
-        self.max_resource = 300
+        self.now_resource = 3.0
+        self.max_resource = 10.0
 
         self.dir_x = None
         self.dir_y = None
@@ -346,9 +348,11 @@ class MainCharacter(Character):
         self.resource_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width // 2 - 301, 640,
                                               bar_width // 3, bar_height // 3)
         # 13, 10은 테두리 맞춰줌
-        self.resource.clip_draw_to_origin(0, 0, col_bar_width * self.now_resource // self.max_resource, col_bar_height,
+        self.resource.clip_draw_to_origin(0, 0,
+                                          int(col_bar_width * self.now_resource // self.max_resource),
+                                          col_bar_height,
                                           width // 2 + 13 - 301, 640 + 10,
-                                          col_bar_width // 3  * self.now_resource // self.max_resource,
+                                          int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
 
@@ -359,8 +363,8 @@ class MainCharacter(Character):
             self.box = [self.m_x, self.m_y, self.m_x + 130, self.m_y + 100]
 
     def get_now_resource(self):
-        if self.now_resource < 300:
-            self.now_resource += 1
+        if self.now_resource < 10.0:
+            self.now_resource += game_framework.frame_time
 
     def set_look(self):
         if self.dir_x == 1:
@@ -368,13 +372,14 @@ class MainCharacter(Character):
         elif self.dir_x == -1:
             self.look_at = - 1
 
+    # 자원 3을 소비하여 소환
     def summon(self, event):
-        if event == KEY1 and self.now_resource >= 100:
-            self.now_resource -= 100
+        if event == KEY1 and self.now_resource >= 3.0:
+            self.now_resource -= 3.0
             warrior = Warrior(1)
             game_world.add_object(warrior, 2)
-        elif event == KEY5 and self.now_resource >= 100:
-            self.now_resource -= 100
-            warrior = Warrior(5)
+        elif event == KEY5 and self.now_resource >= 3.0:
+            self.now_resource -= 3.0
+            warrior = Warrior(2)
             game_world.add_object(warrior, 2)
 

@@ -136,6 +136,8 @@ class DEAD:
 
 # 히트박스 120, 110
 # 충돌지점 -> m_x + 120
+# 6km/h의 이동 속도
+# 공격 쿨타임 3초
 class Warrior(NPC):
     idle = None
     run = None
@@ -145,12 +147,12 @@ class Warrior(NPC):
     run_size = (131, 158)
     hit_size = (198, 175)
     death_size = (187, 175)
-    def __init__(self, i_key):
+    def __init__(self, i_layer):
         # 1층 115  2층 325
-        if i_key == 1:
-            super().__init__(0, 40, 5, 50)
-        elif i_key == 5:
-            super().__init__(0, 250, 5, 50)
+        if i_layer == 1:
+            super().__init__(0, 40, 5, 50, i_layer)
+        elif i_layer == 2:
+            super().__init__(0, 250, 5, 50, i_layer)
 
         if Warrior.idle == None:
             self.idle = load_image('image/warrior_idle.png')
@@ -171,7 +173,7 @@ class Warrior(NPC):
 
     def check_enemy(self):
         for enemy in game_object[1]:
-            if self.m_x + 120 > enemy.m_x:
+            if self.m_x + 120 > enemy.m_x and enemy.layer == self.layer:
                 return True
         return False
 

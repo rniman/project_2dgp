@@ -34,10 +34,10 @@ class IDLE:
     @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_IDLE * IDLE_PER_TIME * game_framework.frame_time) % 8
-        if self.cool_time > 0:
-            self.cool_time -= 1
+        if self.cool_time > 0.0:
+            self.cool_time -= game_framework.frame_time
         if self.check_enemy():
-            if self.cool_time == 0:
+            if self.cool_time <= 0.0:
                 self.cur_state.exit(self)
                 self.cur_state = HIT
                 self.cur_state.enter(self)
@@ -64,15 +64,15 @@ class RUN:
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 16
         self.m_x -= self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
-        if self.cool_time > 0:
-            self.cool_time -= 1
+        if self.cool_time > 0.0:
+            self.cool_time -= game_framework.frame_time
         if self.m_x < 50:
             self.m_x = 50
             print(self.m_x)
 
         if self.check_enemy():
             self.cur_state.exit(self)
-            if self.cool_time == 0:
+            if self.cool_time <= 0.0:
                 self.cur_state = HIT
             else:
                 self.cur_state = IDLE
@@ -99,7 +99,7 @@ class HIT:
         oldFrame = self.frame
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
         if int(oldFrame) >= 10 and int(self.frame) <= 3:
-            self.cool_time = 100
+            self.cool_time = 2.5
             self.cur_state.exit(self)
             if self.check_enemy():
                 self.cur_state = IDLE
@@ -135,6 +135,9 @@ class DEAD:
                                        self.m_x, self.m_y)
 
 # 히트박스 120, 110
+# 충돌 지점 self.m_x - 120
+# 5km/h의 이동 속도
+# 공격 쿨타임 2.5초
 class EnemyWarrior(NPC):
     idle = None
     warrior_run = None
@@ -144,8 +147,12 @@ class EnemyWarrior(NPC):
     run_size = (123, 113)
     hit_size = (174, 136)
     death_size = (195, 149)
-    def __init__(self):
-        super().__init__(1200, 40, 10, 70)
+    def __init__(self, i_layer):
+        if i_layer == 1:
+            super().__init__(1200, 40, 10, 70, i_layer)
+        else:
+            super().__init__(1200, 240, 10, 70, i_layer)
+
         if EnemyWarrior.idle == None:
             self.idle = load_image('image/Ewarrior_idle.png')
             self.run = load_image('image/Ewarrior_run.png')
@@ -165,7 +172,7 @@ class EnemyWarrior(NPC):
         if self.m_x == 50:
             return True
         for enemy in game_object[2]:
-            if self.m_x - 120 < enemy.m_x:
+            if self.m_x - 120 < enemy.m_x and enemy.layer == self.layer:
                 return True
         return False
 

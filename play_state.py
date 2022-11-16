@@ -1,9 +1,8 @@
-
-
 from pico2d import *
 import game_framework
 import logo_state
 import game_world
+import random
 
 from castle import Castle
 from back_ground import BackGround
@@ -45,7 +44,7 @@ ladder = None
 floor = None
 castle = None
 mainChar = None
-time = 0
+state_time = 0
 
 # 초기화
 def enter():
@@ -70,15 +69,17 @@ def exit():
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
+# 임시로 5초마다 적 생성
 def update():
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.update()
-    global time
-    time += 1
-    if time % 100 == 0:
-        ewarrior = enemy_warrior.EnemyWarrior()
+    global state_time
+    state_time += game_framework.frame_time
+    if state_time >= 5.0:
+        ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
         game_world.add_object(ewarrior, 1)
+        state_time = 0.0
     delay(0.03)
 
 def draw_world():
