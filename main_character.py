@@ -153,8 +153,9 @@ class HIT:
 
     @staticmethod
     def do(self):
+        oldFrame = self.frame
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
-        if int(self.frame) == 0:
+        if int(oldFrame) >= 10 and int(self.frame) <= 4:
             if self.dir_x == 0:
                 self.change_state(IDLE, HIT)
                 self.set_look()

@@ -6,4 +6,4 @@ class NPC(Character):
         super().__init__(i_x, i_y, i_attack, 1)
         self.health_point = i_health
         self.dir_x = 1
-        self.cool_time = 0
+        self.cool_time = 0.0
