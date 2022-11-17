@@ -59,10 +59,11 @@ def enter():
     game_world.add_object(back_ground, 0)
     game_world.add_objects(ladder, 0)
     game_world.add_object(floor, 0)
-    game_world.add_object(castle, 0)
+    game_world.add_object(castle, 1)
+    game_world.add_collision_pairs(castle, None, 'castle:eWar')
 
     mainChar = MainCharacter()
-    game_world.add_object(mainChar, 3)
+    game_world.add_object(mainChar, 4)
 
 
 # 종료
@@ -79,8 +80,9 @@ def update():
     state_time += game_framework.frame_time
     if state_time >= 5.0:
         ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
-        game_world.add_object(ewarrior, 1)
+        game_world.add_object(ewarrior, 2)
         game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
+        game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
         state_time = 0.0
 
     for fir, sec, group in game_world.all_collision_pairs():

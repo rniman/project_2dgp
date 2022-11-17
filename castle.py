@@ -24,8 +24,8 @@ class Castle:
         self.castle.draw(self.m_x, self.m_y)
         self.hp_bar.clip_draw_to_origin(0, 0, bar_width, bar_height, width//2 - 301, 680,
                                         bar_width // 3, bar_height // 3)
-        self.hp.clip_draw_to_origin(0, 0, col_bar_width  * self.now_hp // self.max_hp, col_bar_height, width//2 + 13 - 301, 680 + 10,
-                                    col_bar_width // 3  * self.now_hp // self.max_hp, col_bar_height // 3)
+        self.hp.clip_draw_to_origin(0, 0, col_bar_width * self.now_hp // self.max_hp, col_bar_height, width//2 + 13 - 301, 680 + 10,
+                                    col_bar_width // 3 * self.now_hp // self.max_hp, col_bar_height // 3)
         # draw_rectangle(*self.get_bounding_box())
 
     def get_bounding_box(self):
@@ -36,3 +36,6 @@ class Castle:
 
     def no_collide(self, other, group):
         pass
+
+    def take_damage(self, damage):
+        self.now_hp -= damage

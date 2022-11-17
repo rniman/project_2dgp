@@ -99,7 +99,7 @@ class HIT:
         oldFrame = self.frame
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
         if self.frame > 6 and self.do_hit == False:
-            for enemy in game_object[2]:
+            for enemy in game_object[3]:
                 if self.get_hit_bb()[0] < enemy.get_bounding_box()[2] and enemy.layer == self.layer:
                     enemy.take_damage(self.give_damage())
             self.do_hit = True
@@ -171,7 +171,7 @@ class EnemyWarrior(NPC):
 
     def update(self):
         self.cur_state.do(self)
-        print(self.health_point)
+        # print(self.health_point)
 
     def draw(self):
         self.cur_state.draw(self)
@@ -179,9 +179,7 @@ class EnemyWarrior(NPC):
         # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):
-        if self.m_x == 50:
-            return True
-        for enemy in game_object[2]:
+        for enemy in game_object[3]:
             if self.get_bounding_box()[0] < enemy.get_bounding_box()[2] and enemy.layer == self.layer:
                 return True
         return False
@@ -193,9 +191,14 @@ class EnemyWarrior(NPC):
         return self.m_x + 10, self.m_y, self.m_x + 80, self.m_y + 110
 
     def collide(self, other, group):
-        if group != 'war:eWar':
-            return
-        if self.cur_state == RUN:
+        if group == "castle:eWar" and self.cur_state == RUN:
+            self.cur_state.exit(self)
+            if self.cool_time <= 0.0:
+                self.cur_state = HIT
+            else:
+                self.cur_state = IDLE
+            self.cur_state.enter(self)
+        if group == 'war:eWar' and self.cur_state == RUN:
             self.cur_state.exit(self)
             if self.cool_time <= 0.0:
                 self.cur_state = HIT
@@ -205,6 +208,13 @@ class EnemyWarrior(NPC):
 
     def take_damage(self, damage):
         self.health_point -= damage
+        if self.health_point <= 0:
+            self.die()
 
     def give_damage(self):
         return self.attack_damage
+
+    def die(self):
+        self.cur_state.exit(self)
+        self.cur_state = DEAD
+        self.cur_state.enter(self)

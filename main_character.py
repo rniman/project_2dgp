@@ -160,7 +160,7 @@ class HIT:
 
         if self.frame > 8 and self.do_hit == False:
             a = 0
-            for enemy in game_world.game_object[1]:
+            for enemy in game_world.game_object[2]:
                 if self.get_hit_bb()[0] > enemy.get_bounding_box()[2]:
                     continue
                 if self.get_hit_bb()[2] < enemy.get_bounding_box()[0]:
@@ -423,12 +423,12 @@ class MainCharacter(Character):
         if event == KEY1 and self.now_resource >= 3.0:
             self.now_resource -= 3.0
             warrior = Warrior(1)
-            game_world.add_object(warrior, 2)
+            game_world.add_object(warrior, 3)
             game_world.add_collision_pairs(warrior, None, 'war:eWar')
         elif event == KEY5 and self.now_resource >= 3.0:
             self.now_resource -= 3.0
             warrior = Warrior(2)
-            game_world.add_object(warrior, 2)
+            game_world.add_object(warrior, 3)
             game_world.add_collision_pairs(warrior, None, 'war:eWar')
 
     def get_bounding_box(self):
