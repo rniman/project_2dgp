@@ -2,7 +2,7 @@
 # layer 1: enemy
 # layer 2: friendly
 # layer 3: mainCharacter
-game_object = [[], [], [], [], []]
+game_object = [[], [], [], [], [], []]
 
 #collision information
 # key 'main:ladder' string

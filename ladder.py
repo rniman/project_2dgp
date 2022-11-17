@@ -12,11 +12,11 @@ class Ladder:
         pass
 
     def draw(self):
-        self.ladder.draw(self.mx, 160)
+        self.ladder.draw(self.mx, 140)
         # draw_rectangle(*self.get_bounding_box())
 
     def get_bounding_box(self):
-        return self.mx - 35, 160 - 175/2, self.mx + 35, 160 + 175/2
+        return self.mx - 35, 140 - 175/2, self.mx + 35, 140 + 175/2
 
     def collide(self, other, group):
         pass

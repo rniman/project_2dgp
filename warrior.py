@@ -79,7 +79,7 @@ class RUN:
     @staticmethod
     def draw(self):
         self.run.clip_draw_to_origin(self.run_size[0] * int(self.frame), 0, self.run_size[0], self.run_size[1],
-                                     self.m_x, self.m_y)
+                                     self.m_x, self.m_y - 5)
 
 
 class HIT:
@@ -101,9 +101,7 @@ class HIT:
             for enemy in game_object[2]:
                 if self.get_hit_bb()[2] > enemy.get_bounding_box()[0] and enemy.layer == self.layer:
                     enemy.take_damage(self.give_damage())
-            for castle in game_object[1]:
-                if self.get_hit_bb()[2] > enemy.get_bounding_box()[0]:
-                    castle.take_damage(self.give_damage())
+
             self.do_hit = True
 
         if int(oldFrame) >= 10 and int(self.frame) <= 5:
@@ -149,6 +147,7 @@ class DEAD:
 # 6km/h의 이동 속도
 # 공격 쿨타임 3초
 # 히트 사이즈 80 -> 실제 히트 60
+# 데미지 7, 체력 50
 class Warrior(NPC):
     idle = None
     run = None
@@ -158,12 +157,15 @@ class Warrior(NPC):
     run_size = (131, 158)
     hit_size = (198, 175)
     death_size = (187, 175)
+
     def __init__(self, i_layer):
         # 1층 115  2층 325
         if i_layer == 1:
-            super().__init__(0, 40, 5, 50, i_layer)
+            super().__init__(0, 40, 7, 50, i_layer)
         elif i_layer == 2:
-            super().__init__(0, 250, 5, 50, i_layer)
+            # 190, 250 은 불가능할듯
+            # 205 265에서 선택하면 될듯
+            super().__init__(0, 235, 7, 50, i_layer)
 
         if Warrior.idle == None:
             self.idle = load_image('image/warrior_idle.png')
@@ -181,7 +183,7 @@ class Warrior(NPC):
 
     def draw(self):
         self.cur_state.draw(self)
-        # draw_rectangle(*self.get_bounding_box())
+        draw_rectangle(*self.get_bounding_box())
         # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):
@@ -191,7 +193,7 @@ class Warrior(NPC):
         return False
 
     def get_bounding_box(self):
-        return self.m_x + 40, self.m_y, self.m_x + 120, self.m_y + 110
+        return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, self.m_x + 120 - self.pos_dif, self.m_y + 110 - self.pos_dif
 
     def get_hit_bb(self):
         return self.m_x + 100, self.m_y, self.m_x + 180, self.m_y + 110

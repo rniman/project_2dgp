@@ -229,11 +229,11 @@ class CLIMB:
             if box[2] < 265 or box[0] > 835:
                 self.change_state(self.prev_state)
                 return
-            if box[1] != 250:
+            if box[1] != 245:
                 self.change_state(self.prev_state)
                 return
 
-            if self.m_y == 250:
+            if self.m_y == 245:
                 self.m_y -= 5
                 if self.m_x < 500:
                     self.m_x = 220
@@ -279,8 +279,8 @@ class CLIMB:
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         self.m_y += self.dir_y * CLIMB_SPEED_PPS * game_framework.frame_time
-        if self.m_y > 250:
-            self.m_y = 250
+        if self.m_y > 245:
+            self.m_y = 245
             if self.look_at == -1:
                 self.m_x += 40  # flip x좌표 이미지 보정
 

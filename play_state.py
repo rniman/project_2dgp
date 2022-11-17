@@ -9,6 +9,7 @@ from back_ground import BackGround
 from floor import Floor
 from ladder import Ladder
 from main_character import MainCharacter
+from decor import Decor
 
 import warrior
 import enemy_warrior
@@ -42,24 +43,30 @@ def handle_events():
 back_ground = None
 ladder = None
 floor = None
+decor = None
 castle = None
 mainChar = None
 state_time = 0
 
 # 초기화
 def enter():
-    global back_ground, ladder, floor
+    global back_ground, ladder, floor, decor
     global castle
     global mainChar
     back_ground = BackGround()
     ladder = [Ladder(300), Ladder(800)]
     floor = Floor()
     castle = Castle()
+    decor = [Decor(270), Decor(200)]
 
     game_world.add_object(back_ground, 0)
-    game_world.add_objects(ladder, 0)
     game_world.add_object(floor, 0)
+    game_world.add_objects(ladder, 0)
     game_world.add_object(castle, 1)
+    game_world.add_object(decor[0], 0)
+    game_world.add_object(decor[1], 5)
+
+
     game_world.add_collision_pairs(castle, None, 'castle:eWar')
 
     mainChar = MainCharacter()
@@ -78,7 +85,7 @@ def update():
             game_object.update()
     global state_time
     state_time += game_framework.frame_time
-    if state_time >= 5.0:
+    if state_time >= 2.0:
         ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
         game_world.add_object(ewarrior, 2)
         game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
@@ -93,7 +100,6 @@ def update():
         #     fir.no_collide(sec, group)
         #     sec.no_collide(fir, group)
 
-    # delay(0.03)
 
 def draw_world():
     for game_object in game_world.all_objects():
