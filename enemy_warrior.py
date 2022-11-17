@@ -103,7 +103,7 @@ class HIT:
                 if self.get_hit_bb()[0] < enemy.get_bounding_box()[2] and enemy.layer == self.layer:
                     enemy.take_damage(self.give_damage())
             for castle in game_object[1]:
-                if self.get_hit_bb()[2] > castle.get_bounding_box()[0]:
+                if self.get_hit_bb()[0] < castle.get_bounding_box()[2]:
                     castle.take_damage(self.give_damage())
             self.do_hit = True
 

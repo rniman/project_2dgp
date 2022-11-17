@@ -1,4 +1,5 @@
 from pico2d import *
+import game_framework
 
 width = 1280
 height = 720
@@ -18,7 +19,8 @@ class Castle:
         self.now_hp = 1000
 
     def update(self):
-        pass
+        if self.now_hp <= 0:
+            game_framework.quit()
 
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)

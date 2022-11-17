@@ -28,12 +28,12 @@ def handle_events():
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
-            for war in game_world.game_object[2]:
+            for war in game_world.game_object[3]:
                 war.cur_state.exit(war)
                 war.cur_state = warrior.DEAD
                 war.cur_state.enter(war)
         elif event.type == SDL_KEYDOWN and event.key == SDLK_w:
-            for war in game_world.game_object[1]:
+            for war in game_world.game_object[2]:
                 war.cur_state.exit(war)
                 war.cur_state = enemy_warrior.DEAD
                 war.cur_state.enter(war)
