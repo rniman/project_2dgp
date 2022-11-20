@@ -16,13 +16,10 @@ def exit():
     del image
 
 def update():
-    # logo time을 계산하고 1초가 넘으면 running을 false로
     global logo_Time  # ,  running
-    delay(0.01)
-    logo_Time += 0.01
-    if logo_Time >= 1.0:
+    # logo_Time += game_framework.frame_time
+    if logo_Time >= 3.0:
         logo_Time = 0.0
-        # running = False
         game_framework.change_state(play_state)
 
 def draw():
@@ -32,7 +29,7 @@ def draw():
 
 
 def handle_events():
-    events = get_events()
+    pass
 
 
 

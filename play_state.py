@@ -20,6 +20,7 @@ bar_width = 1808
 bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
+play_time = 0
 
 def handle_events():
     global mainChar
@@ -75,11 +76,14 @@ def enter():
 
 # 종료
 def exit():
+    print(play_time)
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
 # 임시로 5초마다 적 생성
 def update():
+    global play_time
+    play_time += game_framework.frame_time
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.update()

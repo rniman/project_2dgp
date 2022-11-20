@@ -183,7 +183,7 @@ class Warrior(NPC):
 
     def draw(self):
         self.cur_state.draw(self)
-        draw_rectangle(*self.get_bounding_box())
+        # draw_rectangle(*self.get_bounding_box())
         # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):

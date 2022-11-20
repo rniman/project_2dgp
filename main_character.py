@@ -250,7 +250,6 @@ class CLIMB:
 
         elif event == DU and self.dir_y != None:
             self.dir_y += 1
-            print(self.dir_y)
             if self.prev_state == CLIMB:
                 pass
             else:
@@ -405,8 +404,8 @@ class MainCharacter(Character):
                                           int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
-        draw_rectangle(*self.get_bounding_box())
-        draw_rectangle(*self.get_hit_bb())
+        # draw_rectangle(*self.get_bounding_box())
+        # draw_rectangle(*self.get_hit_bb())
 
     def get_now_resource(self):
         if self.now_resource < 10.0:
