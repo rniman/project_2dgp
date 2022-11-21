@@ -8,7 +8,7 @@ width = 1280
 height = 720
 
 pico2d.open_canvas(width, height)
-game_framework.run(title_state)
+game_framework.run(logo_state)
 # game_framework.run(play_state)
 pico2d.close_canvas()
 
