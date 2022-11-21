@@ -67,7 +67,6 @@ def enter():
     game_world.add_object(decor[0], 0)
     game_world.add_object(decor[1], 5)
 
-
     game_world.add_collision_pairs(castle, None, 'castle:eWar')
 
     mainChar = MainCharacter()

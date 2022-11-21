@@ -143,6 +143,13 @@ class DEAD:
         self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
                                        self.m_x, self.m_y)
 
+next_state = {
+    IDLE:{},
+    HIT:{},
+    RUN:{},
+    DEAD:{}
+}
+
 # 히트박스 80, 110
 # 충돌 지점 self.m_x - 120
 # 5km/h의 이동 속도
@@ -177,12 +184,9 @@ class EnemyWarrior(NPC):
 
     def update(self):
         self.cur_state.do(self)
-        # print(self.health_point)
 
     def draw(self):
         self.cur_state.draw(self)
-        # draw_rectangle(*self.get_bounding_box())
-        # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):
         for enemy in game_object[3]:
@@ -191,9 +195,8 @@ class EnemyWarrior(NPC):
         return False
 
     def get_bounding_box(self):
-        return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, self.m_x + 120 - self.pos_dif, self.m_y + 110 - self.pos_dif
-        # return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, \
-        #        self.m_x + 120 - self.pos_dif, self.m_y + 110 - self.pos_dif
+        return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, self.m_x + 120 - self.pos_dif,\
+               self.m_y + 110 - self.pos_dif
 
     def get_hit_bb(self):
         return self.m_x + 10, self.m_y, self.m_x + 80, self.m_y + 110

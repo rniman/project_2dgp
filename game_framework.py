@@ -97,8 +97,6 @@ def run(start_state):
         cur_time += frame_time
         # print(f'Frame Time:{frame_time}, Frame Rate:{frame_rate}')
 
-
-
     # repeatedly delete the top of the stack
     while len(stack) > 0:
         stack[-1].exit()

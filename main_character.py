@@ -12,10 +12,11 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5 = range(11)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5, \
+CHANGETOIDLE, CHANGETORUN= range(13)
 
 key_event_table = {
-    (SDL_KEYDOWN, SDLK_SPACE) : SPACE,
+    (SDL_KEYDOWN, SDLK_SPACE): SPACE,
     (SDL_KEYDOWN, SDLK_RIGHT): RD,
     (SDL_KEYDOWN, SDLK_LEFT): LD,
     (SDL_KEYDOWN, SDLK_UP): UD,
@@ -53,6 +54,7 @@ class IDLE:
     def enter(self, event):
         if self.dir_x != None:
             self.dir_x = 0
+        return True
 
     @staticmethod
     def exit(self, event):
@@ -97,8 +99,8 @@ class RUN:
             self.dir_x += 1
         elif self.dir_x == None:
             self.dir_x = 0
-            self.change_state(IDLE, None)
-
+            return False
+        return True
 
     @staticmethod
     def exit(self, event):
@@ -112,13 +114,8 @@ class RUN:
     @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-
         self.m_x += self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
         self.m_x = clamp(40, self.m_x, 1160)
-        # if self.m_x > 1150:
-        #     self.m_x = 1150
-        # elif self.m_x < 50:
-        #     self.m_x = 50
 
     @staticmethod
     def draw(self):
@@ -138,13 +135,19 @@ class HIT:
             self.frame = 0
             self.do_hit = False
         elif event == LD or event == RU:
-            self.dir_x -= 1
+            if self.dir_x != None:
+                self.dir_x -= 1
         elif event == RD or event == LU:
-            self.dir_x += 1
+            if self.dir_x != None:
+                self.dir_x += 1
         elif event == UU or event == DD:
-            self.dir_y -= 1
+            if self.dir_y != None:
+                self.dir_y -= 1
         elif event == UD or event == DU:
-            self.dir_y += 1
+            if self.dir_y != None:
+                self.dir_y += 1
+
+        return True
 
     @staticmethod
     def exit(self, event):
@@ -159,7 +162,6 @@ class HIT:
         self.frame = (self.frame + FRAMES_PER_HIT * HIT_PER_TIME * game_framework.frame_time) % 12
 
         if self.frame > 8 and self.do_hit == False:
-            a = 0
             for enemy in game_world.game_object[2]:
                 if self.get_hit_bb()[0] > enemy.get_bounding_box()[2]:
                     continue
@@ -173,11 +175,11 @@ class HIT:
             self.do_hit = True
 
         if int(oldFrame) >= 10 and int(self.frame) <= 4:
-            if self.dir_x == 0:
-                self.change_state(IDLE, HIT)
+            if self.dir_x == 0 or self.dir_x == None:
+                self.add_event(CHANGETOIDLE)
                 self.set_look()
             else:
-                self.change_state(RUN, HIT)
+                self.add_event(CHANGETORUN)
                 self.set_look()
 
     @staticmethod
@@ -201,14 +203,11 @@ class CLIMB:
 
             box = self.get_bounding_box()
             if box[0] > 335 and box[2] < 765:
-                self.change_state(self.prev_state)
-                return
+                return False
             if box[2] < 265 or box[0] > 835:
-                self.change_state(self.prev_state)
-                return
+                return False
             if box[1] != 40:
-                self.change_state(self.prev_state)
-                return
+                return False
 
             if self.m_y == 40:
                 self.m_y += 5
@@ -224,14 +223,11 @@ class CLIMB:
 
             box = self.get_bounding_box()
             if box[0] > 335 and box[2] < 765:
-                self.change_state(self.prev_state)
-                return
+                return False
             if box[2] < 265 or box[0] > 835:
-                self.change_state(self.prev_state)
-                return
+                return False
             if box[1] != 245:
-                self.change_state(self.prev_state)
-                return
+                return False
 
             if self.m_y == 245:
                 self.m_y -= 5
@@ -245,30 +241,28 @@ class CLIMB:
             if self.prev_state == CLIMB:
                 pass
             else:
-                self.change_state(self.prev_state)
-                return
+                return False
 
         elif event == DU and self.dir_y != None:
             self.dir_y += 1
             if self.prev_state == CLIMB:
                 pass
             else:
-                self.change_state(self.prev_state)
-                return
+                return False
 
         elif event == UU or event == DU:
             self.dir_y = 0
-            self.change_state(IDLE, None)
-            return
+            return False
 
         elif event == LD or event == RU:
             self.dir_x -= 1
         elif event == RD or event == LU:
             self.dir_x += 1
 
+        return True
+
     @staticmethod
     def exit(self, event):
-        self.frame = 0
         if event == KEY1:
             self.summon(event)
         elif event == KEY5:
@@ -284,13 +278,11 @@ class CLIMB:
                 self.m_x += 40  # flip x좌표 이미지 보정
 
             if self.dir_x == 0:
-                self.change_state(IDLE, CLIMB)
+                self.add_event(CHANGETOIDLE)
                 self.set_look()
-                return
             else:
-                self.change_state(RUN, CLIMB)
                 self.set_look()
-                return
+                self.add_event(CHANGETORUN)
 
         elif self.m_y < 40:
             self.m_y = 40
@@ -298,13 +290,11 @@ class CLIMB:
                 self.m_x += 40  # flip x좌표 이미지 보정
 
             if self.dir_x == 0:
-                self.change_state(IDLE, CLIMB)
+                self.add_event(CHANGETOIDLE)
                 self.set_look()
-                return
             else:
-                self.change_state(RUN, CLIMB)
+                self.add_event(CHANGETORUN)
                 self.set_look()
-                return
 
 
 
@@ -315,10 +305,14 @@ class CLIMB:
                                        self.m_x, self.m_y)
 
 next_state = {
-    IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: IDLE,  KEY5: IDLE},
-    RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: RUN,  KEY5: RUN},
-    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT, KEY1: HIT,  KEY5: HIT},
-    CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: CLIMB,  KEY5: CLIMB}
+    IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: IDLE,
+           KEY5: IDLE, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+    RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: RUN,
+          KEY5: RUN, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+    HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT, KEY1: HIT,
+          KEY5: HIT, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+    CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB,
+            KEY1: CLIMB,  KEY5: CLIMB, CHANGETOIDLE: IDLE, CHANGETORUN: RUN}
 }
 
 
@@ -369,13 +363,6 @@ class MainCharacter(Character):
     def add_event(self, event):
         self.event_que.insert(0, event)
 
-    def change_state(self, next_state, prev_state = None):
-        self.cur_state.exit(self, None)
-        self.cur_state = next_state
-        if prev_state != None:
-            self.prev_state = prev_state
-        self.cur_state.enter(self, None)
-
     def handle_event(mainChar, event):
         if(event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
@@ -383,14 +370,16 @@ class MainCharacter(Character):
 
     def update(self):
         self.get_now_resource()
-        self.cur_state.do(self)
         # 이벤트 큐가 있다면 이벤트 발생
+        self.cur_state.do(self)
         if self.event_que:
             event = self.event_que.pop()
             self.cur_state.exit(self, event)
             self.prev_state = self.cur_state
             self.cur_state = next_state[self.cur_state][event]
-            self.cur_state.enter(self, event)
+            if self.cur_state.enter(self, event) != True:
+                self.cur_state = self.prev_state
+
 
     def draw(self):
         #
@@ -404,8 +393,6 @@ class MainCharacter(Character):
                                           int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
-        # draw_rectangle(*self.get_bounding_box())
-        # draw_rectangle(*self.get_hit_bb())
 
     def get_now_resource(self):
         if self.now_resource < 10.0:

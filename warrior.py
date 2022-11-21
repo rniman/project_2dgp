@@ -2,7 +2,10 @@ from pico2d import *
 from npc import NPC
 from game_world import game_object
 from game_world import remove_object
+from game_world import remove_collision_object
 import game_framework
+
+COOLTIME, COLLISION, NOTCOLLISION = range(3)
 
 PIXEL_PER_METER = 10.0 / 0.1  # 10픽셀당 10cm
 
@@ -127,6 +130,7 @@ class DEAD:
     @staticmethod
     def exit(self):
         remove_object(self)
+        remove_collision_object(self)
         pass
 
     @staticmethod
@@ -141,6 +145,10 @@ class DEAD:
         self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
                                        self.m_x, self.m_y - 20)
 
+
+next_state = {
+
+}
 
 # 히트박스  80, 110
 # 충돌지점 -> m_x + 120
@@ -183,8 +191,6 @@ class Warrior(NPC):
 
     def draw(self):
         self.cur_state.draw(self)
-        # draw_rectangle(*self.get_bounding_box())
-        # draw_rectangle(*self.get_hit_bb())
 
     def check_enemy(self):
         for enemy in game_object[2]:
@@ -200,6 +206,7 @@ class Warrior(NPC):
 
     def collide(self, other, group):
         if group == 'war:eWar' and self.cur_state == RUN:
+            # add_event
             self.cur_state.exit(self)
             if self.cool_time <= 0.0:
                 self.cur_state = HIT
