@@ -1,6 +1,6 @@
 from pico2d import *
 import game_framework
-import logo_state
+import pause_state
 import game_world
 import random
 
@@ -10,6 +10,7 @@ from floor import Floor
 from ladder import Ladder
 from main_character import MainCharacter
 from decor import Decor
+from pause_button import Pause
 
 import warrior
 import enemy_warrior
@@ -20,26 +21,6 @@ bar_width = 1808
 bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
-play_time = 0
-
-def handle_events():
-    global mainChar
-    events = get_events()
-    for event in events:
-        if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_q:
-            for war in game_world.game_object[3]:
-                war.cur_state.exit(war)
-                war.cur_state = warrior.DEAD
-                war.cur_state.enter(war)
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_w:
-            for war in game_world.game_object[2]:
-                war.cur_state.exit(war)
-                war.cur_state = enemy_warrior.DEAD
-                war.cur_state.enter(war)
-        else:
-            mainChar.handle_event(event)
 
 back_ground = None
 ladder = None
@@ -47,13 +28,21 @@ floor = None
 decor = None
 castle = None
 mainChar = None
-state_time = 0
+pause_bt = None
+play_time = None
 
 # 초기화
 def enter():
+    print('enter')
+    global pause_bt
     global back_ground, ladder, floor, decor
     global castle
     global mainChar
+    global play_time
+    play_time = 0
+
+    pause_bt = Pause()
+
     back_ground = BackGround()
     ladder = [Ladder(300), Ladder(800)]
     floor = Floor()
@@ -63,6 +52,7 @@ def enter():
     game_world.add_object(back_ground, 0)
     game_world.add_object(floor, 0)
     game_world.add_objects(ladder, 0)
+    game_world.add_object(pause_bt, 0)
     game_world.add_object(castle, 1)
     game_world.add_object(decor[0], 0)
     game_world.add_object(decor[1], 5)
@@ -75,7 +65,14 @@ def enter():
 
 # 종료
 def exit():
-    print(play_time)
+    print('exit')
+    global pause_bt
+    global back_ground, ladder, floor, decor
+    global castle
+    global mainChar
+    global play_time
+
+    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
@@ -83,26 +80,23 @@ def exit():
 def update():
     global play_time
     play_time += game_framework.frame_time
+
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.update()
-    global state_time
-    state_time += game_framework.frame_time
-    if state_time >= 2.0:
+
+    if play_time >= 2.0:
         ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
         game_world.add_object(ewarrior, 2)
         game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
         game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
-        state_time = 0.0
+        play_time = 0.0
 
     for fir, sec, group in game_world.all_collision_pairs():
+
         if collide(fir, sec):
             fir.collide(sec, group)
             sec.collide(fir, group)
-        # else:
-        #     fir.no_collide(sec, group)
-        #     sec.no_collide(fir, group)
-
 
 def draw_world():
     for game_object in game_world.all_objects():
@@ -114,6 +108,25 @@ def draw():
     clear_canvas()
     draw_world()
     update_canvas()
+
+def handle_events():
+    global mainChar
+    events = get_events()
+    for event in events:
+        if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            game_framework.quit()
+        elif event.type == SDL_MOUSEBUTTONDOWN:
+            if event.y <= 720 - (660 + 25):
+                continue
+            if event.y >= 720 - (660 - 25):
+                continue
+            if event.x <= 1220 - 19:
+                continue
+            if event.x >= 1220 + 19:
+                continue
+            game_framework.push_state(pause_state)
+        else:
+            mainChar.handle_event(event)
 
 
 def collide(first, second):  # 두개의 객체가 사각형이라는 전제
@@ -127,4 +140,8 @@ def collide(first, second):  # 두개의 객체가 사각형이라는 전제
 
     return True
 
+def pause():
+    pass
 
+def resume():
+    pass

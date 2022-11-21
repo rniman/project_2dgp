@@ -36,6 +36,10 @@ def clear():
         del o
     for layer in game_object:
         layer.clear()
+    for a, b, group in all_collision_pairs():
+        del a, b, group
+    collision_group.clear()
+
 
 def add_collision_pairs(first, second, group):
     if group not in collision_group:

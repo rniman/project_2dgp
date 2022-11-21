@@ -1,25 +1,23 @@
 from pico2d import *
 import game_framework
 
-import play_state
-
 image = None
 font = None
-window = None
+back_board = None
 button = None
 
 def enter():
-    global image, font, window, button
+    global image, font, back_board, button
     image = load_image('image/title_background.png')
     font = load_font('font/Kozuka Gothic Pro - Bold.otf', 40)
-    window = load_image('image/Window_Background.png')
+    back_board = load_image('image/window_background.png')
     button = load_image('image/decline.png')
 
 def exit():
-    global image, font, window, button
+    global image, font, back_board, button
     del image
     del font
-    del window
+    del back_board
     del button
 
 def update():
@@ -28,7 +26,7 @@ def update():
 def draw():
     clear_canvas()
     image.clip_draw(0, 0, 1280, 720, 1280 / 2, 720 / 2, 1280, 720)
-    window.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2, 1000, 700)
+    back_board.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2, 1000, 700)
     button.clip_draw(0, 0, 68, 71, 1050, 630)
     font.draw(230, 320, f'SPACE: ATTACK', (200, 200, 200))
     font.draw(230, 420, f'Arrow Key: MOVE', (200, 200, 200))

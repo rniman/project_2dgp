@@ -7,8 +7,6 @@ class Button:
         if Button.button == None:
             self.button = load_image('image/button.png')
             self.font = load_font('font/Arial_Black.ttf', 25)
-        # self.x
-        # self.y
 
     def update(self):
         pass

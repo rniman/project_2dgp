@@ -5,8 +5,6 @@ from game_world import remove_object
 from game_world import remove_collision_object
 import game_framework
 
-COOLTIME, COLLISION, NOTCOLLISION = range(3)
-
 PIXEL_PER_METER = 10.0 / 0.1  # 10픽셀당 10cm
 
 RUN_SPEED_KMPH = 6.0
@@ -213,12 +211,6 @@ class Warrior(NPC):
             else:
                 self.cur_state = IDLE
             self.cur_state.enter(self)
-
-        # if group == 'war:eWar':
-        #     if 'war' not in self.enemy_list:
-        #         self.enemy_list['war'] = []
-        #     if other not in self.enemy_list['war']:
-        #         self.enemy_list['war'].append(other)
 
     def take_damage(self, damage):
         self.health_point -= damage

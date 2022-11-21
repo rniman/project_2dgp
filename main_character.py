@@ -296,8 +296,6 @@ class CLIMB:
                 self.add_event(CHANGETORUN)
                 self.set_look()
 
-
-
     @staticmethod
     def draw(self):
         self.climb.clip_draw_to_origin(int(self.frame) * self.climb_size[0], 0,
@@ -387,12 +385,12 @@ class MainCharacter(Character):
                                               bar_width // 3, bar_height // 3)
         # 13, 10은 테두리 맞춰줌
         self.resource.clip_draw_to_origin(0, 0,
-                                          int(col_bar_width * self.now_resource // self.max_resource),
-                                          col_bar_height,
+                                          int(col_bar_width * self.now_resource // self.max_resource), col_bar_height,
                                           width // 2 + 13 - 301, 640 + 10,
                                           int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
+        draw_rectangle(*self.get_bounding_box())
 
     def get_now_resource(self):
         if self.now_resource < 10.0:
