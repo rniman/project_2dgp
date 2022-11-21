@@ -16,12 +16,14 @@ def enter():
     button = load_image('image/decline.png')
 
 def exit():
-    global image
+    global image, font, window, button
     del image
+    del font
+    del window
+    del button
 
 def update():
     handle_events()
-    pass
 
 def draw():
     clear_canvas()
