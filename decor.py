@@ -5,7 +5,7 @@ width = 1280
 class Decor:
     def __init__(self, i_y):
         self.floor = load_image('image/decor.png')
-        self.m_y= i_y
+        self.m_y = i_y
 
     def update(self):
         pass

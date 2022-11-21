@@ -3,19 +3,27 @@ import game_framework
 
 import play_state
 import guide_state
+from start_button import Start
+from tutorial_button import Tutorial
+from exit_button import Exit
 
 image = None
 font = None
 window = None
 button = None
-
+start_bt = None
+tutorial_bt = None
+exit_bt = None
 
 def enter():
     global image, font, window, button
+    global start_bt, exit_bt, tutorial_bt
     image = load_image('image/title_background.png')
     font = load_font('font/Arial_Black.ttf', 25)
     window = load_image('image/Window_Background.png')
-    button = load_image('image/button.png')
+    start_bt = Start()
+    tutorial_bt = Tutorial()
+    exit_bt = Exit()
 
 def exit():
     global image
@@ -29,12 +37,9 @@ def draw():
     clear_canvas()
     image.clip_draw(0, 0, 1280, 720, 1280 / 2, 720 / 2, 1280, 720)
     window.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2)
-    button.clip_draw(0, 0, 454, 142, 1280 / 2, 720 / 2 + 100, 454 / 3 * 2, 142 / 2)
-    button.clip_draw(0, 0, 454, 142, 1280 / 2, 720 / 2, 454 / 3 * 2, 142 / 2)
-    button.clip_draw(0, 0, 454, 142, 1280 / 2, 720 / 2 - 100, 454 / 3 * 2, 142 / 2)
-    font.draw(640 - 40, 360 + 100, f'START', (0, 0, 0))
-    font.draw(640 - 40, 360, f'START', (0, 0, 0))
-    font.draw(640 - 30, 360 - 100, f'EXIT', (0, 0, 0))
+    start_bt.draw()
+    tutorial_bt.draw()
+    exit_bt.draw()
     update_canvas()
 
 def handle_events():

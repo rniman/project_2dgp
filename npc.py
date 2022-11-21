@@ -1,5 +1,4 @@
-
-from character import  Character
+from character import Character
 import random
 
 class NPC(Character):

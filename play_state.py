@@ -117,7 +117,7 @@ def draw():
     update_canvas()
 
 
-def collide(first, second):
+def collide(first, second):  # 두개의 객체가 사각형이라는 전제
     left_fir, bottom_fir, right_fir, top_fir = first.get_bounding_box()
     left_sec, bottom_sec, right_sec, top_sec = second.get_bounding_box()
 
