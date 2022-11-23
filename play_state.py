@@ -1,8 +1,8 @@
 from pico2d import *
-import game_framework
-import pause_state
-import game_world
 import random
+import game_framework
+import game_world
+import pause_state
 
 from castle import Castle
 from back_ground import BackGround

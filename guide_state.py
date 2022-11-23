@@ -9,7 +9,7 @@ button = None
 def enter():
     global image, font, back_board, button
     image = load_image('image/title_background.png')
-    font = load_font('font/Kozuka Gothic Pro - Bold.otf', 40)
+    font = load_font('font/kozuka_gothic_bold.otf', 40)
     back_board = load_image('image/window_background.png')
     button = load_image('image/decline.png')
 

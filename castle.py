@@ -1,5 +1,6 @@
 from pico2d import *
 import game_framework
+import over_state
 
 width = 1280
 height = 720
@@ -22,7 +23,7 @@ class Castle:
 
     def update(self):
         if self.now_hp <= 0:
-            game_framework.quit()
+            game_framework.push_state(over_state)
 
     def draw(self):
         self.castle.draw(self.m_x, self.m_y)
@@ -30,7 +31,7 @@ class Castle:
                                         bar_width // 3, bar_height // 3)
         self.hp.clip_draw_to_origin(0, 0, col_bar_width * self.now_hp // self.max_hp, col_bar_height, width//2 + 13 - 301, 680 + 10,
                                     col_bar_width // 3 * self.now_hp // self.max_hp, col_bar_height // 3)
-        # draw_rectangle(*self.get_bounding_box())
+
 
     def get_bounding_box(self):
         return 0, self.m_y - 516 / 2, 177 / 2,  self.m_y + 516 / 2
