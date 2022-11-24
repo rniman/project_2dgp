@@ -23,15 +23,6 @@ FRAMES_PER_ACTION = 16
 
 class IDLE:
     @staticmethod
-    def enter(self):
-        self.dir_x = 0
-        pass
-
-    @staticmethod
-    def exit(self):
-        pass
-
-    @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_IDLE * IDLE_PER_TIME * game_framework.frame_time) % 8
 
@@ -42,15 +33,6 @@ class IDLE:
 
 class RUN:
     @staticmethod
-    def enter(self):
-        self.dir_x = 1
-        pass
-
-    @staticmethod
-    def exit(self):
-        pass
-
-    @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 16
 
@@ -59,18 +41,7 @@ class RUN:
         self.run.clip_draw_to_origin(self.run_size[0] * int(self.frame), 0, self.run_size[0], self.run_size[1],
                                      self.m_x, self.m_y - 5)
 
-
 class HIT:
-    @staticmethod
-    def enter(self):
-        self.dir_x = 0
-        self.frame = 0
-        self.do_hit = False
-
-    @staticmethod
-    def exit(self):
-        pass
-
     @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 16
@@ -80,34 +51,17 @@ class HIT:
         self.hit.clip_draw_to_origin(self.hit_size[0] * int(self.frame), 0, self.hit_size[0], self.hit_size[1],
                                      self.m_x, self.m_y)
 
-
 class DEAD:
     @staticmethod
-    def enter(self):
-        self.frame = 0
-
-    @staticmethod
-    def exit(self):
-        remove_object(self)
-        remove_collision_object(self)
-        pass
-
-    @staticmethod
     def do(self):
-        oldFrame = self.frame
-        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 16
-        if int(oldFrame) >= 10 and int(self.frame) <= 5:
-            self.cur_state.exit(self)
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time)
+        pass
 
     @staticmethod
     def draw(self):
         self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
                                        self.m_x, self.m_y - 20)
 
-
-next_state = {
-
-}
 
 # 히트박스  80, 110
 # 충돌지점 -> m_x + 120
@@ -130,8 +84,6 @@ class Warrior(NPC):
         if i_layer == 1:
             super().__init__(0, 40, 7, 50, i_layer)
         elif i_layer == 2:
-            # 190, 250 은 불가능할듯
-            # 205 265에서 선택하면 될듯
             super().__init__(0, 235, 7, 50, i_layer)
 
         if Warrior.idle == None:
@@ -142,24 +94,19 @@ class Warrior(NPC):
 
         self.hit_box = None
         self.cur_state = RUN
-        self.cur_state.enter(self)
-
+        self.dir_x = 1
+        self.collision = False
         self.build_behavior_tree()
 
     def update(self):
         self.bt.run()
         self.cur_state.do(self)
-        if self.cool_time > 0.0:
+        if self.cool_time >= 0.0:
             self.cool_time -= game_framework.frame_time
+        self.collision = False
 
     def draw(self):
         self.cur_state.draw(self)
-
-    def check_enemy(self):
-        for enemy in game_object[2]:
-            if self.get_bounding_box()[2] > enemy.get_bounding_box()[0] and enemy.layer == self.layer:
-                return True
-        return False
 
     def get_bounding_box(self):
         return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, self.m_x + 120 - self.pos_dif, self.m_y + 110 - self.pos_dif
@@ -168,14 +115,8 @@ class Warrior(NPC):
         return self.m_x + 100, self.m_y, self.m_x + 180, self.m_y + 110
 
     def collide(self, other, group):
-        if group == 'war:eWar' and self.cur_state == RUN:
-            # add_event
-            self.cur_state.exit(self)
-            if self.cool_time <= 0.0:
-                self.cur_state = HIT
-            else:
-                self.cur_state = IDLE
-            self.cur_state.enter(self)
+        if group == 'war:eWar':
+            self.collision = True
 
     def take_damage(self, damage):
         self.health_point -= damage
@@ -186,48 +127,82 @@ class Warrior(NPC):
         return self.attack_damage
 
     def die(self):
-        self.cur_state.exit(self)
-        self.cur_state = DEAD
-        self.cur_state.enter(self)
+        if self.health_point > 0:
+            return BehaviorTree.FAIL
+
+        if self.cur_state != DEAD:
+            self.cur_state = DEAD
+            self.frame = 0
+
+        if self.frame >= 16:
+            remove_object(self)
+            remove_collision_object(self)
+            return BehaviorTree.SUCCESS
+
+        return BehaviorTree.RUNNING
 
     def run_to_right(self):
-        self.cur_state = RUN
+        if self.cur_state != RUN:
+            self.cur_state = RUN
+            self.dir_x = 1
+
         self.m_x += self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
         if self.cool_time > 0.0:
             self.cool_time -= game_framework.frame_time
         if self.m_x > 1150:
             self.m_x = 1150
+
         return BehaviorTree.SUCCESS
 
-    def check(self):
-        for enemy in game_object[2]:
-            if self.get_bounding_box()[2] > enemy.get_bounding_box()[0] and enemy.layer == self.layer:
-                return BehaviorTree.SUCCESS
-        return BehaviorTree.FAIL
+    # def check_enemy(self):
+    #     if self.collision:
+    #         return BehaviorTree.SUCCESS
+    #     return BehaviorTree.FAIL
 
     def check_cool_time(self):
+        if not self.collision:
+            return BehaviorTree.FAIL
+
         if self.cool_time <= 0.0:
             return BehaviorTree.SUCCESS
+
+        if self.cur_state != IDLE:
+            self.cur_state = IDLE
+            self.dir_x = 0
+            self.frame = 0
         return BehaviorTree.RUNNING
 
     def attak_enemy(self):
-        if self.frame > 10:
+        if not self.collision:
+            return BehaviorTree.FAIL
+
+        if self.cur_state != HIT:
+            self.cur_state = HIT
+            self.dir_x = 0
+            self.frame = 0
+            self.do_hit = False
+
+        if self.frame > 10 and self.do_hit == False:
             for enemy in game_object[2]:
                 if self.get_hit_bb()[2] > enemy.get_bounding_box()[0] and enemy.layer == self.layer:
                     enemy.take_damage(self.give_damage())
+            self.do_hit = True
 
-        if int(self.frame) <= 0.5:
+        if int(self.frame) <= 3.0 and self.do_hit == True:
             self.cool_time = 3.0
+            self.do_hit = False
             return BehaviorTree.SUCCESS
 
         return BehaviorTree.RUNNING
 
     def build_behavior_tree(self):
-        check_enemy_node = Leaf("Check Enemy", self.check)
+        # check_enemy_node = Leaf("Check Enemy", self.check_enemy)
         check_cool_time_node = Leaf("Check Cool Time", self.check_cool_time)
         attakc_enemy_node = Leaf("Attack Enemy", self.attak_enemy)
-        cool_time_sequence = Sequence("Check Cool Time and Attack", check_cool_time_node, attakc_enemy_node)
-        attack_sequence = Sequence("Check enemy and Attack", check_enemy_node, cool_time_sequence)
+        # attack_sequence = Sequence("Check enemy and Attack", check_enemy_node, check_cool_time_node, attakc_enemy_node)
+        attack_sequence = Sequence("Check Cool Time and Attack", check_cool_time_node, attakc_enemy_node)
+
         run_node = Leaf("Run to Right", self.run_to_right)
-        root_node = Selector("Attack or Run", attack_sequence, run_node)
+        dead_node = Leaf("Dead", self.die)
+        root_node = Selector("Attack or Run", dead_node, attack_sequence, run_node)
         self.bt = BehaviorTree(root_node)

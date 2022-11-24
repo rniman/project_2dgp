@@ -93,7 +93,6 @@ def update():
         play_time = 0.0
 
     for fir, sec, group in game_world.all_collision_pairs():
-
         if collide(fir, sec):
             fir.collide(sec, group)
             sec.collide(fir, group)

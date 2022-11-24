@@ -68,3 +68,7 @@ def remove_collision_object(object):
     for pairs in collision_group.values():
         if object in pairs[0]: pairs[0].remove(object)
         elif object in pairs[1]: pairs[1].remove(object)
+
+def init_collision_state(fir, sec, group):
+    fir.init_collision(group)
+    sec.init_collision(group)
