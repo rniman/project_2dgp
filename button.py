@@ -13,12 +13,3 @@ class Button:
 
     def draw(self):
         pass
-
-    def get_bounding_box(self):
-        pass
-
-    def collide(self, other, group):
-        pass
-
-    def no_collide(self, other, group):
-        pass

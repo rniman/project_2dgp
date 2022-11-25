@@ -17,7 +17,7 @@ class Castle:
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 100
-        self.now_hp = 0
+        self.now_hp = 100
         # self.max_hp = 1000
         # self.now_hp = 1000
 
@@ -37,9 +37,6 @@ class Castle:
         return 0, self.m_y - 516 / 2, 177 / 2,  self.m_y + 516 / 2
 
     def collide(self, other, group):
-        pass
-
-    def no_collide(self, other, group):
         pass
 
     def take_damage(self, damage):

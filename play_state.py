@@ -11,6 +11,7 @@ from ladder import Ladder
 from main_character import MainCharacter
 from decor import Decor
 from pause_button import Pause
+from clear_time import Clear_time
 
 import warrior
 import enemy_warrior
@@ -30,6 +31,8 @@ castle = None
 mainChar = None
 pause_bt = None
 play_time = None
+clear_time = None
+time_font = None
 
 # 초기화
 def enter():
@@ -38,8 +41,9 @@ def enter():
     global back_ground, ladder, floor, decor
     global castle
     global mainChar
-    global play_time
+    global play_time, clear_time
     play_time = 0
+    clear_time = Clear_time()
 
     pause_bt = Pause()
 
@@ -53,6 +57,7 @@ def enter():
     game_world.add_object(floor, 0)
     game_world.add_objects(ladder, 0)
     game_world.add_object(pause_bt, 0)
+    game_world.add_object(clear_time, 0)
     game_world.add_object(castle, 1)
     game_world.add_object(decor[0], 0)
     game_world.add_object(decor[1], 5)
@@ -70,9 +75,8 @@ def exit():
     global back_ground, ladder, floor, decor
     global castle
     global mainChar
-    global play_time
-
-    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time
+    global play_time, clear_time
+    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
@@ -101,7 +105,6 @@ def draw_world():
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.draw()
-
 # 월드를 그린다
 def draw():
     clear_canvas()

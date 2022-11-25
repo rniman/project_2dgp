@@ -19,10 +19,11 @@ def enter():
 
 
 def exit():
-    global back_board, replay_bt, exit_bt
+    global back_board, replay_bt, exit_bt, over_font
     del back_board
     del replay_bt
     del exit_bt
+    del over_font
 
 def update():
     handle_events()
@@ -31,7 +32,7 @@ def draw():
     back_board.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2, 420, 420)
     replay_bt.draw()
     exit_bt.draw()
-    over_font.draw(1280 / 2 - 170, 720 / 2 + 140, f'GAME OVER', (255, 0, 0))
+    over_font.draw(1280 / 2 - 170, 720 / 2 + 140, f'GAME OVER', (245, 10, 10))
     update_canvas()
 
 def handle_events():

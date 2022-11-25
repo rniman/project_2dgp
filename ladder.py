@@ -14,7 +14,6 @@ class Ladder:
 
     def draw(self):
         self.ladder.draw(self.mx, 140)
-        # draw_rectangle(*self.get_bounding_box())
 
     def get_bounding_box(self):
         return self.mx - 35, 140 - 175/2, self.mx + 35, 140 + 175/2
@@ -22,5 +21,3 @@ class Ladder:
     def collide(self, other, group):
         pass
 
-    def no_collide(self, other, group):
-        pass

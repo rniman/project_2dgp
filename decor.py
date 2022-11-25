@@ -17,9 +17,3 @@ class Decor:
 
     def get_bounding_box(self):
         return 0, 200, 1280 - 1, 310
-
-    def collide(self, other, group):
-        pass
-
-    def no_collide(self, other, group):
-        pass

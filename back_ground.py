@@ -16,8 +16,4 @@ class BackGround:
     def get_bounding_box(self):
         return 0, 0, 1279, 719
 
-    def collide(self):
-        pass
 
-    def no_collide(self, other, group):
-        pass
