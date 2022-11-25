@@ -2,36 +2,38 @@ import game_framework
 import title_state
 import play_state
 from pico2d import *
+from easy_button import Easy
+from hard_button import Hard
 from exit_button import Exit
-from replay_button import Replay
 
 back_board = None
-replay_bt = None
+easy_bt = None
+hard_bt = None
 exit_bt = None
-over_font = None
+
 
 def enter():
-    global back_board, replay_bt, exit_bt, over_font
+    global back_board, easy_bt, hard_bt, exit_bt
     back_board = load_image('image/window_background.png')
-    over_font = load_font('font/megadeth.ttf', 70)
-    replay_bt = Replay()
+    easy_bt = Easy()
+    hard_bt = Hard()
     exit_bt = Exit()
 
-
 def exit():
-    global back_board, replay_bt, exit_bt
+    global back_board, easy_bt, hard_bt, exit_bt
     del back_board
-    del replay_bt
+    del easy_bt
+    del hard_bt
     del exit_bt
 
 def update():
     handle_events()
 
 def draw():
-    back_board.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2, 440, 440)
-    replay_bt.draw()
+    back_board.clip_draw(0, 0, 500, 500, 640, 360, 400, 400)
+    hard_bt.draw()
+    easy_bt.draw()
     exit_bt.draw()
-    over_font.draw(1280 / 2 - 185, 720 / 2 + 140, f'GAME CLEAR', (10, 10, 245))
     update_canvas()
 
 def handle_events():
@@ -48,11 +50,11 @@ def handle_events():
                 continue
 
             if event.y >= 720 / 2 - 142 / 4 and event.y <= 720 / 2 + 142 / 4:
-                game_framework.pop_state()
                 game_framework.change_state(play_state)
-            elif event.y >=  720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
+            elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
+                game_framework.change_state(play_state)
+            elif event.y >= 720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.pop_state()
-                game_framework.change_state(title_state)
 
 def pause():
     pass

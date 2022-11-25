@@ -3,6 +3,7 @@ import game_framework
 
 import play_state
 import guide_state
+import select_difficulty_state
 from play_button import Play
 from tutorial_button import Tutorial
 from exit_button import Exit
@@ -59,7 +60,8 @@ def handle_events():
             if event.y >= 720 / 2 - 142 / 4 and event.y <= 720 / 2 + 142 / 4:
                 game_framework.push_state(guide_state)
             elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
-                game_framework.change_state(play_state)
+                game_framework.push_state(select_difficulty_state)
+                # game_framework.change_state(play_state)
             elif event.y >=  720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.quit()
 
