@@ -31,7 +31,7 @@ def draw():
     back_board.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2, 420, 420)
     replay_bt.draw()
     exit_bt.draw()
-    over_font.draw(1280 / 2 - 170, 720 / 2 + 140, f'GAME OVER', (255, 0, 0))
+    over_font.draw(1280 / 2 - 170, 720 / 2 + 140, f'GAME CLEAR', (0, 0, 255))
     update_canvas()
 
 def handle_events():
