@@ -438,5 +438,3 @@ class MainCharacter(Character):
     def take_damage(self, damage):
         pass
 
-    def give_damage(self):
-        return self.attack_damage

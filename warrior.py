@@ -55,7 +55,6 @@ class DEAD:
     @staticmethod
     def do(self):
         self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time)
-        pass
 
     @staticmethod
     def draw(self):
@@ -92,21 +91,8 @@ class Warrior(NPC):
             self.hit = load_image('image/warrior_hit.png')
             self.death = load_image('image/warrior_death.png')
 
-        self.hit_box = None
         self.cur_state = RUN
-        self.dir_x = 1
-        self.collision = False
         self.build_behavior_tree()
-
-    def update(self):
-        self.bt.run()
-        self.cur_state.do(self)
-        if self.cool_time >= 0.0:
-            self.cool_time -= game_framework.frame_time
-        self.collision = False
-
-    def draw(self):
-        self.cur_state.draw(self)
 
     def get_bounding_box(self):
         return self.m_x + 40 - self.pos_dif, self.m_y - self.pos_dif, self.m_x + 120 - self.pos_dif, self.m_y + 110 - self.pos_dif
@@ -117,14 +103,6 @@ class Warrior(NPC):
     def collide(self, other, group):
         if group == 'war:eWar':
             self.collision = True
-
-    def take_damage(self, damage):
-        self.health_point -= damage
-        if self.health_point <= 0:
-            self.die()
-
-    def give_damage(self):
-        return self.attack_damage
 
     def die(self):
         if self.health_point > 0:
@@ -154,11 +132,6 @@ class Warrior(NPC):
 
         return BehaviorTree.SUCCESS
 
-    # def check_enemy(self):
-    #     if self.collision:
-    #         return BehaviorTree.SUCCESS
-    #     return BehaviorTree.FAIL
-
     def check_cool_time(self):
         if not self.collision:
             return BehaviorTree.FAIL
@@ -172,7 +145,7 @@ class Warrior(NPC):
             self.frame = 0
         return BehaviorTree.RUNNING
 
-    def attak_enemy(self):
+    def attack_enemy(self):
         if not self.collision:
             return BehaviorTree.FAIL
 
@@ -196,11 +169,9 @@ class Warrior(NPC):
         return BehaviorTree.RUNNING
 
     def build_behavior_tree(self):
-        # check_enemy_node = Leaf("Check Enemy", self.check_enemy)
         check_cool_time_node = Leaf("Check Cool Time", self.check_cool_time)
-        attakc_enemy_node = Leaf("Attack Enemy", self.attak_enemy)
-        # attack_sequence = Sequence("Check enemy and Attack", check_enemy_node, check_cool_time_node, attakc_enemy_node)
-        attack_sequence = Sequence("Check Cool Time and Attack", check_cool_time_node, attakc_enemy_node)
+        attack_enemy_node = Leaf("Attack Enemy", self.attack_enemy)
+        attack_sequence = Sequence("Check Cool Time and Attack", check_cool_time_node, attack_enemy_node)
 
         run_node = Leaf("Run to Right", self.run_to_right)
         dead_node = Leaf("Dead", self.die)

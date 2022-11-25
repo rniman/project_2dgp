@@ -17,7 +17,7 @@ class Castle:
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 100
-        self.now_hp = 100
+        self.now_hp = 0
         # self.max_hp = 1000
         # self.now_hp = 1000
 
