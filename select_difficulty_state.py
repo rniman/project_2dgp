@@ -1,6 +1,6 @@
 import game_framework
-import title_state
-import play_state
+import play_hard_state
+import play_easy_state
 from pico2d import *
 from easy_button import Easy
 from hard_button import Hard
@@ -50,9 +50,13 @@ def handle_events():
                 continue
 
             if event.y >= 720 / 2 - 142 / 4 and event.y <= 720 / 2 + 142 / 4:
-                game_framework.change_state(play_state)
+                game_framework.pop_state()
+                game_framework.pop_state()
+                game_framework.change_state(play_hard_state)
             elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
-                game_framework.change_state(play_state)
+                game_framework.pop_state()
+                game_framework.pop_state()
+                game_framework.change_state(play_easy_state)
             elif event.y >= 720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.pop_state()
 

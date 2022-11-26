@@ -81,9 +81,9 @@ class Warrior(NPC):
     def __init__(self, i_layer):
         # 1층 115  2층 325
         if i_layer == 1:
-            super().__init__(0, 40, 7, 50, i_layer)
+            super().__init__(0, 40, 5, 70, i_layer)
         elif i_layer == 2:
-            super().__init__(0, 235, 7, 50, i_layer)
+            super().__init__(0, 235, 5, 70, i_layer)
 
         if Warrior.idle == None:
             self.idle = load_image('image/warrior_idle.png')

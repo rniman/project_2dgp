@@ -43,7 +43,7 @@ def clear():
 
 def add_collision_pairs(first, second, group):
     if group not in collision_group:
-        collision_group[group] = [[],[]]
+        collision_group[group] = [[], []]
 
     # a b의 None 확인 이유 b만 추가 할경우 add_c_p(None,b,name)을 쓸수 있기 때문
     if first:

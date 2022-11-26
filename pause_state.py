@@ -1,6 +1,7 @@
 import game_framework
 import title_state
-import play_state
+import play_hard_state
+import select_difficulty_state
 from pico2d import *
 from play_button import Play
 from exit_button import Exit
@@ -49,13 +50,12 @@ def handle_events():
                 continue
 
             if event.y >= 720 / 2 - 142 / 4 and event.y <= 720 / 2 + 142 / 4:
-                game_framework.pop_state()
-                game_framework.change_state(play_state)
-            elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
-                game_framework.pop_state()
+                game_framework.push_state(select_difficulty_state)
             elif event.y >=  720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.pop_state()
                 game_framework.change_state(title_state)
+            elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
+                game_framework.pop_state()
 
 def pause():
     pass

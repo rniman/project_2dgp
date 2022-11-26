@@ -36,14 +36,14 @@ time_font = None
 
 # 초기화
 def enter():
-    print('enter')
+    print('easy')
     global pause_bt
     global back_ground, ladder, floor, decor
     global castle
     global mainChar
     global play_time, clear_time
     play_time = 0
-    clear_time = Clear_time()
+    clear_time = Clear_time(120)
 
     pause_bt = Pause()
 
@@ -82,19 +82,28 @@ def exit():
 # 월드의 존재하는 객체들을 업데이트
 # 임시로 5초마다 적 생성
 def update():
-    global play_time
+    global play_time, clear_time
     play_time += game_framework.frame_time
+    summon_number = 1
 
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.update()
 
     if play_time >= 2.0:
-        ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
-        game_world.add_object(ewarrior, 2)
-        game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
-        game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
+        if clear_time.get_time() < 50.0:
+            summon_number = random.randint(1, 2)
+        if clear_time.get_time() < 20.0:
+            summon_number = 2
+
+
+        for i in range(summon_number):
+            ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
+            game_world.add_object(ewarrior, 2)
+            game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
+            game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
         play_time = 0.0
+
 
     for fir, sec, group in game_world.all_collision_pairs():
         if collide(fir, sec):
@@ -105,6 +114,7 @@ def draw_world():
     for game_object in game_world.all_objects():
         if game_object != None:
             game_object.draw()
+
 # 월드를 그린다
 def draw():
     clear_canvas()

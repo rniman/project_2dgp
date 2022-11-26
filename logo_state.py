@@ -2,7 +2,7 @@ from pico2d import *
 import game_framework
 
 import title_state
-import play_state
+import play_hard_state
 
 image = None
 logo_Time = 0.0

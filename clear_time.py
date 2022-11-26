@@ -16,3 +16,5 @@ class Clear_time:
         self.time_font.draw(600, 620, f'{int(self.clear_time) // 60:.0f} : {int(self.clear_time) % 60:.0f}',
                             (249, 243, 231))
 
+    def get_time(self):
+        return self.clear_time
