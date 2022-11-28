@@ -2,8 +2,9 @@ from pico2d import *
 import random
 import game_framework
 import game_world
-import pause_state
+import server
 
+import pause_state
 from castle import Castle
 from back_ground import BackGround
 from floor import Floor
@@ -66,7 +67,8 @@ def enter():
 
     mainChar = MainCharacter()
     game_world.add_object(mainChar, 4)
-
+    server.music = load_music('music/play_bgm.mp3')
+    server.music.play()
 
 # 종료
 def exit():
@@ -76,7 +78,10 @@ def exit():
     global castle
     global mainChar
     global play_time, clear_time
-    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time
+
+
+    server.music.stop()
+    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time, server.music
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
@@ -96,12 +101,11 @@ def update():
         if clear_time.get_time() < 20.0:
             summon_number = 2
 
-
-        # for i in range(summon_number):
-        #     ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
-        #     game_world.add_object(ewarrior, 2)
-        #     game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
-        #     game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
+        for i in range(summon_number):
+            ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
+            game_world.add_object(ewarrior, 2)
+            game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
+            game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
         play_time = 0.0
 
 

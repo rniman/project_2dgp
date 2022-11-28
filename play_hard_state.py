@@ -2,6 +2,7 @@ from pico2d import *
 import random
 import game_framework
 import game_world
+import server
 import pause_state
 
 from castle import Castle
@@ -13,7 +14,6 @@ from decor import Decor
 from pause_button import Pause
 from clear_time import Clear_time
 
-import warrior
 import enemy_warrior
 
 width = 1280
@@ -67,6 +67,8 @@ def enter():
     mainChar = MainCharacter()
     game_world.add_object(mainChar, 4)
 
+    server.music = load_music('music/play_bgm.mp3')
+    server.music.play()
 
 # 종료
 def exit():
@@ -76,7 +78,9 @@ def exit():
     global castle
     global mainChar
     global play_time, clear_time
-    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time
+
+    server.music.stop()
+    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time, server.music
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
