@@ -81,7 +81,7 @@ class EnemyWarrior(NPC):
 
     def __init__(self, i_layer):
         if i_layer == 1:
-            super().__init__(1200, 30, 10, 60, i_layer)
+            super().__init__(1200, 25, 10, 60, i_layer)
         else:
             # 200 ~ 260
             super().__init__(1200, 230, 10, 60, i_layer)

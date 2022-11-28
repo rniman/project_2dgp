@@ -97,11 +97,11 @@ def update():
             summon_number = 2
 
 
-        for i in range(summon_number):
-            ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
-            game_world.add_object(ewarrior, 2)
-            game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
-            game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
+        # for i in range(summon_number):
+        #     ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
+        #     game_world.add_object(ewarrior, 2)
+        #     game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
+        #     game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
         play_time = 0.0
 
 

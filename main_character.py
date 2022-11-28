@@ -108,8 +108,6 @@ class RUN:
             self.summon(event)
         elif event == KEY5:
             self.summon(event)
-        else:
-            self.frame = 0
 
     @staticmethod
     def do(self):
@@ -134,12 +132,17 @@ class HIT:
         if event == SPACE and self.prev_state != HIT:
             self.frame = 0
             self.do_hit = False
-        elif event == LD or event == RU:
-            if self.dir_x != None:
-                self.dir_x -= 1
-        elif event == RD or event == LU:
-            if self.dir_x != None:
-                self.dir_x += 1
+        elif event == LD:
+            if self.dir_x == None:
+                self.dir_x = 0
+            self.dir_x -= 1
+        elif event == RU and self.dir_x != None:
+            self.dir_x -= 1
+        elif event == RD:
+            if self.dir_x == None:
+                self.dir_x = 0
+        elif event == LU and self.dir_x != None:
+            self.dir_x += 1
         elif event == UU or event == DD:
             if self.dir_y != None:
                 self.dir_y -= 1
@@ -174,13 +177,28 @@ class HIT:
                 enemy.take_damage(self.give_damage())
             self.do_hit = True
 
-        if int(oldFrame) >= 10 and int(self.frame) <= 4:
-            if self.dir_x == 0 or self.dir_x == None:
-                self.add_event(CHANGETOIDLE)
-                self.set_look()
+        if int(oldFrame) >= 10 and int(self.frame) <= 3:
+            if self.dir_x == 0:
+                if not self.event_que:  # 남아 있는 이벤트 없다면 그냥 이벤트 추가
+                    self.add_event(CHANGETOIDLE)
+                else:  # 남아있는 이벤트 조사
+                    remain_event = 0
+                    for event in self.event_que:
+                        if event > 0 and event < 5:
+                            remain_event += 1
+                    if remain_event % 2 != 0:
+                        self.add_event(CHANGETORUN)
             else:
-                self.add_event(CHANGETORUN)
-                self.set_look()
+                if not self.event_que:
+                    self.add_event(CHANGETORUN)
+                    self.set_look()
+                else:
+                    remain_event = 0
+                    for event in self.event_que:
+                        if remain_event > 0 and event < 5:
+                            remain_event += 1
+                    if remain_event % 2 != 0:
+                        self.add_event(CHANGETOIDLE)
 
     @staticmethod
     def draw(self):
@@ -279,7 +297,6 @@ class CLIMB:
 
             if self.dir_x == 0:
                 self.add_event(CHANGETOIDLE)
-                self.set_look()
             else:
                 self.set_look()
                 self.add_event(CHANGETORUN)
@@ -291,7 +308,6 @@ class CLIMB:
 
             if self.dir_x == 0:
                 self.add_event(CHANGETOIDLE)
-                self.set_look()
             else:
                 self.add_event(CHANGETORUN)
                 self.set_look()
@@ -371,6 +387,7 @@ class MainCharacter(Character):
         # 이벤트 큐가 있다면 이벤트 발생
         self.cur_state.do(self)
         if self.event_que:
+            print(f"{self.cur_state} -> {self.event_que}, {self.dir_x}")
             event = self.event_que.pop()
             self.cur_state.exit(self, event)
             self.prev_state = self.cur_state
@@ -400,7 +417,7 @@ class MainCharacter(Character):
         if self.dir_x == 1:
             self.look_at = 1
         elif self.dir_x == -1:
-            self.look_at = - 1
+            self.look_at = -1
 
     # 자원 3을 소비하여 소환
     def summon(self, event):
