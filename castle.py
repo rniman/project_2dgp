@@ -16,6 +16,7 @@ class Castle:
         self.castle = load_image("image/castle.png")
         self.hp_bar = load_image("image/bar.png")
         self.hp = load_image("image/hp.png")
+        self.collision_sound_effect = load_wav('sound_effect/castle_collision.wav')
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 100
@@ -40,4 +41,5 @@ class Castle:
         pass
 
     def take_damage(self, damage):
+        self.collision_sound_effect.play()
         self.now_hp -= damage

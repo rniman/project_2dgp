@@ -22,8 +22,4 @@ class NPC(Character):
     def draw(self):
         self.cur_state.draw(self)
 
-    def take_damage(self, damage):
-        self.health_point -= damage
-        if self.health_point <= 0:
-            self.die()
 

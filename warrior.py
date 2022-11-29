@@ -28,7 +28,7 @@ class IDLE:
 
     @staticmethod
     def draw(self):
-        self.idle.clip_draw_to_origin(self.idle_size[0] * int(self.frame), 0, self.idle_size[0], self.idle_size[1],
+        Warrior.idle.clip_draw_to_origin(Warrior.idle_size[0] * int(self.frame), 0, Warrior.idle_size[0], Warrior.idle_size[1],
                                       self.m_x + 50, self.m_y)
 
 class RUN:
@@ -38,7 +38,7 @@ class RUN:
 
     @staticmethod
     def draw(self):
-        self.run.clip_draw_to_origin(self.run_size[0] * int(self.frame), 0, self.run_size[0], self.run_size[1],
+        Warrior.run.clip_draw_to_origin(Warrior.run_size[0] * int(self.frame), 0, Warrior.run_size[0], Warrior.run_size[1],
                                      self.m_x, self.m_y - 5)
 
 class HIT:
@@ -48,7 +48,7 @@ class HIT:
 
     @staticmethod
     def draw(self):
-        self.hit.clip_draw_to_origin(self.hit_size[0] * int(self.frame), 0, self.hit_size[0], self.hit_size[1],
+        Warrior.hit.clip_draw_to_origin(Warrior.hit_size[0] * int(self.frame), 0, Warrior.hit_size[0], Warrior.hit_size[1],
                                      self.m_x, self.m_y)
 
 class DEAD:
@@ -58,7 +58,7 @@ class DEAD:
 
     @staticmethod
     def draw(self):
-        self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
+        Warrior.death.clip_draw_to_origin(Warrior.death_size[0] * int(self.frame), 0, Warrior.death_size[0], Warrior.death_size[1],
                                        self.m_x, self.m_y - 20)
 
 
@@ -78,6 +78,10 @@ class Warrior(NPC):
     hit_size = (198, 175)
     death_size = (187, 175)
 
+    hit_sound_effect = None
+    collision_sound_effect = None
+    dead_sound_effect = None
+
     def __init__(self, i_layer):
         # 1층 115  2층 325
         if i_layer == 1:
@@ -86,10 +90,13 @@ class Warrior(NPC):
             super().__init__(0, 235, 5, 70, i_layer)
 
         if Warrior.idle == None:
-            self.idle = load_image('image/warrior_idle.png')
-            self.run = load_image('image/warrior_run.png')
-            self.hit = load_image('image/warrior_hit.png')
-            self.death = load_image('image/warrior_death.png')
+            Warrior.idle = load_image('image/warrior_idle.png')
+            Warrior.run = load_image('image/warrior_run.png')
+            Warrior.hit = load_image('image/warrior_hit.png')
+            Warrior.death = load_image('image/warrior_death.png')
+            Warrior.hit_sound_effect = load_wav('sound_effect/warrior_swing.wav')
+            Warrior.collision_sound_effect = load_wav('sound_effect/warrior_collision.wav')
+            Warrior.dead_sound_effect = load_wav('sound_effect/warrior_die (mp3cut.net).wav')
 
         self.cur_state = RUN
         self.build_behavior_tree()
@@ -104,11 +111,18 @@ class Warrior(NPC):
         if group == 'war:eWar':
             self.collision = True
 
+    def take_damage(self, damage):
+        Warrior.collision_sound_effect.play()
+        self.health_point -= damage
+        if self.health_point <= 0:
+            self.die()
+
     def die(self):
         if self.health_point > 0:
             return BehaviorTree.FAIL
 
         if self.cur_state != DEAD:
+            Warrior.dead_sound_effect.play()
             self.cur_state = DEAD
             self.frame = 0
 
@@ -150,6 +164,7 @@ class Warrior(NPC):
             return BehaviorTree.FAIL
 
         if self.cur_state != HIT:
+            Warrior.hit_sound_effect.play()
             self.cur_state = HIT
             self.dir_x = 0
             self.frame = 0

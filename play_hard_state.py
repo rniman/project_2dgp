@@ -28,7 +28,6 @@ ladder = None
 floor = None
 decor = None
 castle = None
-mainChar = None
 pause_bt = None
 play_time = None
 clear_time = None
@@ -40,7 +39,6 @@ def enter():
     global pause_bt
     global back_ground, ladder, floor, decor
     global castle
-    global mainChar
     global play_time, clear_time
     play_time = 0
     clear_time = Clear_time(120)
@@ -64,8 +62,8 @@ def enter():
 
     game_world.add_collision_pairs(castle, None, 'castle:eWar')
 
-    mainChar = MainCharacter()
-    game_world.add_object(mainChar, 4)
+    server.main_character = MainCharacter()
+    game_world.add_object(server.main_character, 4)
 
     server.music = load_music('music/play_bgm.mp3')
     server.music.play()
@@ -76,11 +74,11 @@ def exit():
     global pause_bt
     global back_ground, ladder, floor, decor
     global castle
-    global mainChar
     global play_time, clear_time
 
     server.music.stop()
-    del pause_bt, back_ground, ladder, floor, decor, castle, mainChar, play_time, clear_time, server.music
+    del pause_bt, back_ground, ladder, floor, decor, castle, play_time, clear_time, server.music
+    del server.main_character
     game_world.clear()
 
 # 월드의 존재하는 객체들을 업데이트
@@ -125,7 +123,6 @@ def draw():
     update_canvas()
 
 def handle_events():
-    global mainChar
     events = get_events()
     for event in events:
         if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
@@ -141,7 +138,7 @@ def handle_events():
                 continue
             game_framework.push_state(pause_state)
         else:
-            mainChar.handle_event(event)
+            server.main_character.handle_event(event)
 
 
 def collide(first, second):  # 두개의 객체가 사각형이라는 전제

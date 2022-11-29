@@ -30,8 +30,8 @@ class IDLE:
 
     @staticmethod
     def draw(self):
-        self.idle.clip_draw_to_origin(self.idle_size[0] * int(self.frame), 0, self.idle_size[0], self.idle_size[1],
-                                              self.m_x, self.m_y, self.idle_size[0], self.idle_size[1])
+        EnemyWarrior.idle.clip_draw_to_origin(EnemyWarrior.idle_size[0] * int(self.frame), 0, EnemyWarrior.idle_size[0], EnemyWarrior.idle_size[1],
+                                              self.m_x, self.m_y)
 class RUN:
     @staticmethod
     def do(self):
@@ -39,7 +39,7 @@ class RUN:
 
     @staticmethod
     def draw(self):
-        self.run.clip_draw_to_origin(self.run_size[0] * int(self.frame), 0, self.run_size[0], self.run_size[1],
+        EnemyWarrior.run.clip_draw_to_origin(EnemyWarrior.run_size[0] * int(self.frame), 0, EnemyWarrior.run_size[0], EnemyWarrior.run_size[1],
                                             self.m_x, self.m_y)
 
 class HIT:
@@ -49,8 +49,8 @@ class HIT:
 
     @staticmethod
     def draw(self):
-        self.hit.clip_draw_to_origin(self.hit_size[0] * int(self.frame), 0, self.hit_size[0], self.hit_size[1],
-                                             self.m_x, self.m_y, self.hit_size[0], self.hit_size[1])
+        EnemyWarrior.hit.clip_draw_to_origin(EnemyWarrior.hit_size[0] * int(self.frame), 0, EnemyWarrior.hit_size[0], EnemyWarrior.hit_size[1],
+                                             self.m_x, self.m_y)
 
 class DEAD:
     @staticmethod
@@ -59,7 +59,7 @@ class DEAD:
 
     @staticmethod
     def draw(self):
-        self.death.clip_draw_to_origin(self.death_size[0] * int(self.frame), 0, self.death_size[0], self.death_size[1],
+        EnemyWarrior.death.clip_draw_to_origin(EnemyWarrior.death_size[0] * int(self.frame), 0, EnemyWarrior.death_size[0], EnemyWarrior.death_size[1],
                                        self.m_x, self.m_y)
 
 
@@ -79,6 +79,10 @@ class EnemyWarrior(NPC):
     hit_size = (174, 136)
     death_size = (195, 149)
 
+    hit_sound_effect = None
+    collision_sound_effect = None
+    dead_sound_effect = None
+
     def __init__(self, i_layer):
         if i_layer == 1:
             super().__init__(1200, 25, 10, 60, i_layer)
@@ -87,10 +91,13 @@ class EnemyWarrior(NPC):
             super().__init__(1200, 230, 10, 60, i_layer)
 
         if EnemyWarrior.idle == None:
-            self.idle = load_image('image/Ewarrior_idle.png')
-            self.run = load_image('image/Ewarrior_run.png')
-            self.hit = load_image('image/Ewarrior_hit.png')
-            self.death = load_image('image/Ewarrior_death.png')
+            EnemyWarrior.idle = load_image('image/Ewarrior_idle.png')
+            EnemyWarrior.run = load_image('image/Ewarrior_run.png')
+            EnemyWarrior.hit = load_image('image/Ewarrior_hit.png')
+            EnemyWarrior.death = load_image('image/Ewarrior_death.png')
+            EnemyWarrior.hit_sound_effect = load_wav('sound_effect/Ewarrior_swing.wav')
+            EnemyWarrior.collision_sound_effect = load_wav('sound_effect/Ewarrior_collision.wav')
+            EnemyWarrior.dead_sound_effect = load_wav('sound_effect/Ewarrior_die.wav')
 
         self.cur_state = RUN
         self.build_behavior_tree()
@@ -108,7 +115,11 @@ class EnemyWarrior(NPC):
         if group == 'war:eWar':
             self.collision = True
 
-
+    def take_damage(self, damage):
+        EnemyWarrior.collision_sound_effect.play()
+        self.health_point -= damage
+        if self.health_point <= 0:
+            self.die()
 
     def check_cool_time(self):
         if not self.collision:
@@ -128,6 +139,7 @@ class EnemyWarrior(NPC):
             return BehaviorTree.FAIL
 
         if self.cur_state != DEAD:
+            EnemyWarrior.dead_sound_effect.play()
             self.cur_state = DEAD
             self.frame = 0
 
@@ -156,6 +168,7 @@ class EnemyWarrior(NPC):
             return BehaviorTree.FAIL
 
         if self.cur_state != HIT:
+            EnemyWarrior.hit_sound_effect.play()
             self.cur_state = HIT
             self.dir_x = 0
             self.frame = 0

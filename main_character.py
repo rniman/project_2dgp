@@ -141,6 +141,7 @@ class HIT:
         elif event == RD:
             if self.dir_x == None:
                 self.dir_x = 0
+            self.dir_x += 1
         elif event == LU and self.dir_x != None:
             self.dir_x += 1
         elif event == UU or event == DD:
@@ -178,7 +179,10 @@ class HIT:
             self.do_hit = True
 
         if int(oldFrame) >= 10 and int(self.frame) <= 3:
-            if self.dir_x == 0:
+            self.hit_sound_effect.play()
+            if self.dir_x == None:
+                self.add_event(CHANGETOIDLE)
+            elif self.dir_x == 0:
                 if not self.event_que:  # 남아 있는 이벤트 없다면 그냥 이벤트 추가
                     self.add_event(CHANGETOIDLE)
                 else:  # 남아있는 이벤트 조사
@@ -188,6 +192,8 @@ class HIT:
                             remain_event += 1
                     if remain_event % 2 != 0:
                         self.add_event(CHANGETORUN)
+                    else:
+                        self.add_event(CHANGETOIDLE)
             else:
                 if not self.event_que:
                     self.add_event(CHANGETORUN)
@@ -195,10 +201,12 @@ class HIT:
                 else:
                     remain_event = 0
                     for event in self.event_que:
-                        if remain_event > 0 and event < 5:
+                        if event > 0 and event < 5:
                             remain_event += 1
                     if remain_event % 2 != 0:
                         self.add_event(CHANGETOIDLE)
+                    else:
+                        self.add_event(CHANGETORUN)
 
     @staticmethod
     def draw(self):
@@ -356,6 +364,8 @@ class MainCharacter(Character):
         self.resource_bar = load_image('image/bar.png')
         self.resource = load_image('image/resource.png')
 
+        self.hit_sound_effect = load_wav('sound_effect/main_swing.wav')
+
         self.idle_size = (124, 95)
         self.run_size = (143, 110)
         self.climb_size = (125, 87)
@@ -387,7 +397,6 @@ class MainCharacter(Character):
         # 이벤트 큐가 있다면 이벤트 발생
         self.cur_state.do(self)
         if self.event_que:
-            print(f"{self.cur_state} -> {self.event_que}, {self.dir_x}")
             event = self.event_que.pop()
             self.cur_state.exit(self, event)
             self.prev_state = self.cur_state
