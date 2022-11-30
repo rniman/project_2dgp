@@ -3,6 +3,7 @@ import random
 import game_framework
 import game_world
 import server
+import json
 
 import pause_state
 from castle import Castle
@@ -16,13 +17,7 @@ from clear_time import Clear_time
 
 import enemy_warrior
 
-width = 1280
-height = 720
-bar_width = 1808
-bar_height = 124
-col_bar_width = 1730
-col_bar_height = 66
-
+selected_difficulty = None
 back_ground = None
 ladder = None
 floor = None
@@ -32,14 +27,20 @@ pause_bt = None
 play_time = None
 clear_time = None
 time_font = None
+music = None
 
 # 초기화
 def enter():
-    print('easy')
+    global selected_difficulty
     global pause_bt
     global back_ground, ladder, floor, decor
     global castle
     global play_time, clear_time
+    global music
+
+    with open('select_difficulty.json', 'r') as file:
+        selected_difficulty = json.load(file)
+
     play_time = 0
     clear_time = Clear_time(120)
 
@@ -64,27 +65,29 @@ def enter():
 
     server.main_character = MainCharacter()
     game_world.add_object(server.main_character, 4)
-    server.music = load_music('music/play_bgm.mp3')
-    server.music.play()
+    music = load_music('music/play_bgm.mp3')
+    music.play()
+
 
 # 종료
 def exit():
-    print('exit')
     global pause_bt
     global back_ground, ladder, floor, decor
     global castle
     global play_time, clear_time
+    global music
 
-
-    server.music.stop()
-    del pause_bt, back_ground, ladder, floor, decor, castle, play_time, clear_time, server.music
+    del pause_bt, back_ground, ladder, floor, decor, castle, play_time, clear_time
     del server.main_character
     game_world.clear()
+    music.stop()
+    del music
+
 
 # 월드의 존재하는 객체들을 업데이트
 # 임시로 5초마다 적 생성
 def update():
-    global play_time, clear_time
+    global selected_difficulty, play_time, clear_time
     play_time += game_framework.frame_time
     summon_number = 1
 
@@ -93,10 +96,16 @@ def update():
             game_object.update()
 
     if play_time >= 2.0:
-        if clear_time.get_time() < 50.0:
-            summon_number = random.randint(1, 2)
-        if clear_time.get_time() < 20.0:
-            summon_number = 2
+        if selected_difficulty == 'easy':
+            if clear_time.get_time() < 50.0:
+                summon_number = random.randint(1, 2)
+            if clear_time.get_time() < 25.0:
+                summon_number = 2
+        elif selected_difficulty == 'hard':
+            if clear_time.get_time() < 60.0:
+                summon_number = 2
+            if clear_time.get_time() < 30.0:
+                summon_number = random.randint(2, 3)
 
         for i in range(summon_number):
             ewarrior = enemy_warrior.EnemyWarrior(random.randint(1, 2))
@@ -104,7 +113,6 @@ def update():
             game_world.add_collision_pairs(None, ewarrior, 'war:eWar')
             game_world.add_collision_pairs(None, ewarrior, 'castle:eWar')
         play_time = 0.0
-
 
     for fir, sec, group in game_world.all_collision_pairs():
         if collide(fir, sec):

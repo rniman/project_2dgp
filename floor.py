@@ -1,6 +1,5 @@
 from pico2d import *
 
-width = 1280
 
 class Floor:
     def __init__(self):

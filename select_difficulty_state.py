@@ -1,6 +1,8 @@
+
 import game_framework
-import play_hard_state
-import play_easy_state
+import play_state
+import json
+
 from pico2d import *
 from easy_button import Easy
 from hard_button import Hard
@@ -10,7 +12,6 @@ back_board = None
 easy_bt = None
 hard_bt = None
 exit_bt = None
-
 
 def enter():
     global back_board, easy_bt, hard_bt, exit_bt
@@ -50,13 +51,21 @@ def handle_events():
                 continue
 
             if event.y >= 720 / 2 - 142 / 4 and event.y <= 720 / 2 + 142 / 4:
+                select_difficulty = "hard"
+                with open('select_difficulty.json', 'w') as file:
+                    json.dump(select_difficulty, file)
                 game_framework.pop_state()
                 game_framework.pop_state()
-                game_framework.change_state(play_hard_state)
+                game_framework.change_state(play_state)
+
             elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
+                select_difficulty = "easy"
+                with open('select_difficulty.json', 'w') as file:
+                    json.dump(select_difficulty, file)
                 game_framework.pop_state()
                 game_framework.pop_state()
-                game_framework.change_state(play_easy_state)
+                game_framework.change_state(play_state)
+
             elif event.y >= 720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.pop_state()
 

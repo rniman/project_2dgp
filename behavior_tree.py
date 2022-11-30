@@ -1,5 +1,6 @@
 
 level = 0
+
 def indent():
     global level
     level += 1

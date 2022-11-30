@@ -3,7 +3,6 @@ from character import Character
 from warrior import Warrior
 import game_world
 import game_framework
-import ladder
 
 width = 1280
 height = 720
@@ -12,8 +11,7 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5, \
-CHANGETOIDLE, CHANGETORUN= range(13)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5, CHANGETOIDLE, CHANGETORUN = range(13)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_SPACE): SPACE,
@@ -29,7 +27,6 @@ key_event_table = {
     (SDL_KEYUP, SDLK_DOWN): DU
 }
 
-#RUN SPEED
 PIXEL_PER_METER = 10.0 / 0.1 # 10픽셀당 10cm
 
 RUN_SPEED_KMPH = 10.0
@@ -341,14 +338,6 @@ next_state = {
 # 1층 y좌표 40, 2층 y좌표 250
 # 10km/h의 이동속도
 # 자원은 초당 1씩오르며 최대 10까지 보관가능
-#
-# 바운딩 박스
-# if self.cur_state == CLIMB:
-#    self.m_x + 50, self.m_y, self.m_x + 110, self.m_y + 100
-# if self.look_at == 1:
-#    return self.m_x + 50, self.m_y, self.m_x + 120, self.m_y + 100
-# else:
-#    return self.m_x, self.m_y, self.m_x + 70, self.m_y + 100
 # 히트 사이즈 70
 class MainCharacter(Character):
     def __init__(self):
@@ -416,7 +405,6 @@ class MainCharacter(Character):
                                           int(col_bar_width // 3 * self.now_resource // self.max_resource),
                                           col_bar_height // 3)
         self.cur_state.draw(self)
-        draw_rectangle(*self.get_bounding_box())
 
     def get_now_resource(self):
         if self.now_resource < 10.0:

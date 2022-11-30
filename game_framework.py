@@ -92,9 +92,7 @@ def run(start_state):
         stack[-1].draw()
         global frame_time
         frame_time = time.time() - cur_time
-        # frame_rate = 1.0 / frame_time
         cur_time += frame_time
-        # print(f'Frame Time:{frame_time}, Frame Rate:{frame_rate}')
 
     # repeatedly delete the top of the stack
     while len(stack) > 0:

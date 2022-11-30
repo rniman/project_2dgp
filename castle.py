@@ -1,8 +1,6 @@
 from pico2d import *
 import game_framework
-import server
 import over_state
-
 
 width = 1280
 height = 720
@@ -24,7 +22,6 @@ class Castle:
 
     def update(self):
         if self.now_hp <= 0:
-            server.music.stop()
             game_framework.push_state(over_state)
 
     def draw(self):

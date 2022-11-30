@@ -1,7 +1,5 @@
 from pico2d import *
 
-width = 1280
-
 class Decor:
     def __init__(self, i_y):
         self.floor = load_image('image/decor.png')

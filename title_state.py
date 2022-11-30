@@ -1,6 +1,5 @@
 from pico2d import *
 import game_framework
-import server
 import guide_state
 import select_difficulty_state
 from play_button import Play
@@ -13,11 +12,12 @@ back_board = None
 play_bt = None
 tutorial_bt = None
 exit_bt = None
-
+music = None
 
 def enter():
     global image, font, back_board
     global play_bt, exit_bt, tutorial_bt
+    global music
     image = load_image('image/title_background.png')
     font = load_font('font/Arial_Black.ttf', 25)
     back_board = load_image('image/window_background.png')
@@ -25,14 +25,17 @@ def enter():
     tutorial_bt = Tutorial()
     exit_bt = Exit()
 
-    server.music = load_music('music/title_bgm.mp3')
-    server.music.play()
+    music = load_music('music/title_bgm.mp3')
+    music.play()
 
 def exit():
     global image, font, back_board
     global play_bt, exit_bt, tutorial_bt
-    server.music.stop()
-    del image, font, back_board, play_bt, exit_bt, tutorial_bt, server.music
+    global music
+    del image, font, back_board, play_bt, exit_bt, tutorial_bt
+
+    music.stop()
+    del music
 
 def update():
     handle_events()

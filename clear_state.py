@@ -1,5 +1,4 @@
 import game_framework
-import server
 import title_state
 import select_difficulty_state
 from pico2d import *
@@ -10,25 +9,30 @@ back_board = None
 replay_bt = None
 exit_bt = None
 clear_font = None
+music = None
 
 def enter():
     global back_board, replay_bt, exit_bt, clear_font
+    global music
     back_board = load_image('image/window_background.png')
     clear_font = load_font('font/megadeth.ttf', 70)
     replay_bt = Replay()
     exit_bt = Exit()
 
-    server.music = load_music('music/clear_bgm.mp3')
-    server.music.play()
+    music = load_music('music/clear_bgm.mp3')
+    music.play()
 
 
 def exit():
     global back_board, replay_bt, exit_bt, clear_font
+    global music
     del back_board
     del replay_bt
     del exit_bt
     del clear_font
-    server.music.stop()
+
+    music.stop()
+    del music
 
 def update():
     handle_events()

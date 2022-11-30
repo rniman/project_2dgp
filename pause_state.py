@@ -1,6 +1,5 @@
 import game_framework
 import title_state
-import play_hard_state
 import select_difficulty_state
 from pico2d import *
 from play_button import Play

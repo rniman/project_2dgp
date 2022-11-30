@@ -158,8 +158,7 @@ class EnemyWarrior(NPC):
         self.m_x -= self.dir_x * RUN_SPEED_PPS * game_framework.frame_time
         if self.cool_time > 0.0:
             self.cool_time -= game_framework.frame_time
-        if self.m_x > 1150:
-            self.m_x = 1150
+
 
         return BehaviorTree.SUCCESS
 
