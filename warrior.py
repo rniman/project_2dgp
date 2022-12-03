@@ -97,6 +97,9 @@ class Warrior(NPC):
             Warrior.hit_sound_effect = load_wav('sound_effect/warrior_swing.wav')
             Warrior.collision_sound_effect = load_wav('sound_effect/warrior_collision.wav')
             Warrior.dead_sound_effect = load_wav('sound_effect/warrior_die (mp3cut.net).wav')
+            Warrior.hit_sound_effect.set_volume(32)
+            Warrior.collision_sound_effect.set_volume(32)
+            Warrior.dead_sound_effect.set_volume(32)
 
         self.cur_state = RUN
         self.build_behavior_tree()

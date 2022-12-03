@@ -15,6 +15,7 @@ class Castle:
         self.hp_bar = load_image("image/bar.png")
         self.hp = load_image("image/hp.png")
         self.collision_sound_effect = load_wav('sound_effect/castle_collision.wav')
+        self.collision_sound_effect.set_volume(32)
         self.m_x = 0
         self.m_y = 245
         self.max_hp = 100

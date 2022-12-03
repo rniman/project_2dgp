@@ -5,37 +5,26 @@ import select_difficulty_state
 from play_button import Play
 from tutorial_button import Tutorial
 from exit_button import Exit
+from title_back_ground import BackGround
 
-image = None
-font = None
-back_board = None
+background = None
 play_bt = None
 tutorial_bt = None
 exit_bt = None
-music = None
 
 def enter():
-    global image, font, back_board
+    global background
     global play_bt, exit_bt, tutorial_bt
-    global music
-    image = load_image('image/title_background.png')
-    font = load_font('font/Arial_Black.ttf', 25)
-    back_board = load_image('image/window_background.png')
+    background = BackGround()
+
     play_bt = Play()
     tutorial_bt = Tutorial()
     exit_bt = Exit()
 
-    music = load_music('music/title_bgm.mp3')
-    music.play()
-
 def exit():
-    global image, font, back_board
+    global background
     global play_bt, exit_bt, tutorial_bt
-    global music
-    del image, font, back_board, play_bt, exit_bt, tutorial_bt
-
-    music.stop()
-    del music
+    del background, play_bt, exit_bt, tutorial_bt
 
 def update():
     handle_events()
@@ -43,8 +32,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.clip_draw(0, 0, 1280, 720, 1280 / 2, 720 / 2, 1280, 720)
-    back_board.clip_draw(0, 0, 500, 500, 1280 / 2, 720 / 2)
+    background.draw()
     play_bt.draw()
     tutorial_bt.draw()
     exit_bt.draw()
@@ -67,7 +55,6 @@ def handle_events():
                 game_framework.push_state(guide_state)
             elif event.y >= 720 / 2 - 100 - 142 / 4 and event.y <= 720 / 2 - 100 + 142 / 4:
                 game_framework.push_state(select_difficulty_state)
-                # game_framework.change_state(play_state)
             elif event.y >=  720 / 2 + 100 - 142 / 4 and event.y <= 720 / 2 + 100 + 142 / 4:
                 game_framework.quit()
 

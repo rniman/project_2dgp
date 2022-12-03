@@ -11,7 +11,7 @@ bar_height = 124
 col_bar_width = 1730
 col_bar_height = 66
 
-SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY5, CHANGETOIDLE, CHANGETORUN = range(13)
+SPACE, RD, LD, RU, LU, UD, DD, UU, DU, KEY1, KEY2, CHANGETOIDLE, CHANGETORUN = range(13)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_SPACE): SPACE,
@@ -20,7 +20,7 @@ key_event_table = {
     (SDL_KEYDOWN, SDLK_UP): UD,
     (SDL_KEYDOWN, SDLK_DOWN): DD,
     (SDL_KEYDOWN, SDLK_1): KEY1,
-    (SDL_KEYDOWN, SDLK_5): KEY5,
+    (SDL_KEYDOWN, SDLK_2): KEY2,
     (SDL_KEYUP, SDLK_RIGHT): RU,
     (SDL_KEYUP, SDLK_LEFT): LU,
     (SDL_KEYUP, SDLK_UP): UU,
@@ -57,7 +57,7 @@ class IDLE:
     def exit(self, event):
         if event == KEY1:
             self.summon(event)
-        elif event == KEY5:
+        elif event == KEY2:
             self.summon(event)
 
     @staticmethod
@@ -103,7 +103,7 @@ class RUN:
     def exit(self, event):
         if event == KEY1:
             self.summon(event)
-        elif event == KEY5:
+        elif event == KEY2:
             self.summon(event)
 
     @staticmethod
@@ -154,7 +154,7 @@ class HIT:
     def exit(self, event):
         if event == KEY1:
             self.summon(event)
-        elif event == KEY5:
+        elif event == KEY2:
             self.summon(event)
 
     @staticmethod
@@ -288,7 +288,7 @@ class CLIMB:
     def exit(self, event):
         if event == KEY1:
             self.summon(event)
-        elif event == KEY5:
+        elif event == KEY2:
             self.summon(event)
 
     @staticmethod
@@ -325,13 +325,13 @@ class CLIMB:
 
 next_state = {
     IDLE: {SPACE: HIT, LD: RUN, LU: RUN, RD: RUN, RU: RUN, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: IDLE,
-           KEY5: IDLE, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+           KEY2: IDLE, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
     RUN: {SPACE: HIT, LD: IDLE, LU: IDLE, RD: IDLE, RU: IDLE, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB, KEY1: RUN,
-          KEY5: RUN, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+          KEY2: RUN, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
     HIT: {SPACE: HIT, LD: HIT, LU: HIT, RD: HIT, RU: HIT, UD: HIT, DD: HIT, UU: HIT, DU: HIT, KEY1: HIT,
-          KEY5: HIT, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
+          KEY2: HIT, CHANGETOIDLE: IDLE, CHANGETORUN: RUN},
     CLIMB: {SPACE: CLIMB, LD: CLIMB, LU: CLIMB, RD: CLIMB, RU: CLIMB, UD: CLIMB, DD: CLIMB, UU: CLIMB, DU: CLIMB,
-            KEY1: CLIMB,  KEY5: CLIMB, CHANGETOIDLE: IDLE, CHANGETORUN: RUN}
+            KEY1: CLIMB,  KEY2: CLIMB, CHANGETOIDLE: IDLE, CHANGETORUN: RUN}
 }
 
 
@@ -354,6 +354,7 @@ class MainCharacter(Character):
         self.resource = load_image('image/resource.png')
 
         self.hit_sound_effect = load_wav('sound_effect/main_swing.wav')
+        self.hit_sound_effect.set_volume(32)
 
         self.idle_size = (124, 95)
         self.run_size = (143, 110)
@@ -423,7 +424,7 @@ class MainCharacter(Character):
             warrior = Warrior(1)
             game_world.add_object(warrior, 3)
             game_world.add_collision_pairs(warrior, None, 'war:eWar')
-        elif event == KEY5 and self.now_resource >= 3.0:
+        elif event == KEY2 and self.now_resource >= 3.0:
             self.now_resource -= 3.0
             warrior = Warrior(2)
             game_world.add_object(warrior, 3)

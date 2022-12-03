@@ -18,9 +18,9 @@ def enter():
     clear_font = load_font('font/megadeth.ttf', 70)
     replay_bt = Replay()
     exit_bt = Exit()
-
     music = load_music('music/clear_bgm.mp3')
-    music.play()
+    music.set_volume(32)
+    music.repeat_play()
 
 
 def exit():

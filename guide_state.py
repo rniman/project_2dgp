@@ -31,7 +31,7 @@ def draw():
     font.draw(230, 320, f'SPACE: ATTACK', (200, 200, 200))
     font.draw(230, 420, f'Arrow Key: MOVE', (200, 200, 200))
     font.draw(230, 220, f'KEY ''1'': SUMMON WARRIOR FIRST FLOOR', (200, 200, 200))
-    font.draw(230, 120, f'KEY ''5'': SUMMON WARRIOR SECOND FLOOR', (200, 200, 200))
+    font.draw(230, 120, f'KEY ''2'': SUMMON WARRIOR SECOND FLOOR', (200, 200, 200))
     font.draw(230, 620, f'GOAL: Defend the castle', (200, 200, 200))
     font.draw(230, 520, f'DEFEAT: A castle collapses', (200, 200, 200))
     update_canvas()

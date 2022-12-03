@@ -98,6 +98,9 @@ class EnemyWarrior(NPC):
             EnemyWarrior.hit_sound_effect = load_wav('sound_effect/Ewarrior_swing.wav')
             EnemyWarrior.collision_sound_effect = load_wav('sound_effect/Ewarrior_collision.wav')
             EnemyWarrior.dead_sound_effect = load_wav('sound_effect/Ewarrior_die.wav')
+            EnemyWarrior.hit_sound_effect.set_volume(24)
+            EnemyWarrior.collision_sound_effect.set_volume(24)
+            EnemyWarrior.dead_sound_effect.set_volume(16)
 
         self.cur_state = RUN
         self.build_behavior_tree()

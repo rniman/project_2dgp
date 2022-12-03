@@ -7,7 +7,7 @@ import json
 
 import pause_state
 from castle import Castle
-from back_ground import BackGround
+from background import BackGround
 from floor import Floor
 from ladder import Ladder
 from main_character import MainCharacter
@@ -18,7 +18,7 @@ from clear_time import Clear_time
 import enemy_warrior
 
 selected_difficulty = None
-back_ground = None
+background = None
 ladder = None
 floor = None
 decor = None
@@ -26,17 +26,14 @@ castle = None
 pause_bt = None
 play_time = None
 clear_time = None
-time_font = None
-music = None
 
 # 초기화
 def enter():
     global selected_difficulty
     global pause_bt
-    global back_ground, ladder, floor, decor
+    global background, ladder, floor, decor
     global castle
     global play_time, clear_time
-    global music
 
     with open('select_difficulty.json', 'r') as file:
         selected_difficulty = json.load(file)
@@ -46,13 +43,13 @@ def enter():
 
     pause_bt = Pause()
 
-    back_ground = BackGround()
+    background = BackGround()
     ladder = [Ladder(300), Ladder(800)]
     floor = Floor()
     castle = Castle()
     decor = [Decor(270), Decor(200)]
 
-    game_world.add_object(back_ground, 0)
+    game_world.add_object(background, 0)
     game_world.add_object(floor, 0)
     game_world.add_objects(ladder, 0)
     game_world.add_object(pause_bt, 0)
@@ -65,23 +62,19 @@ def enter():
 
     server.main_character = MainCharacter()
     game_world.add_object(server.main_character, 4)
-    music = load_music('music/play_bgm.mp3')
-    music.play()
 
 
 # 종료
 def exit():
     global pause_bt
-    global back_ground, ladder, floor, decor
+    global background, ladder, floor, decor
     global castle
     global play_time, clear_time
-    global music
 
-    del pause_bt, back_ground, ladder, floor, decor, castle, play_time, clear_time
+    del pause_bt, background, ladder, floor, decor, castle, play_time, clear_time
     del server.main_character
     game_world.clear()
-    music.stop()
-    del music
+
 
 
 # 월드의 존재하는 객체들을 업데이트

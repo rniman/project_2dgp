@@ -20,7 +20,8 @@ def enter():
     exit_bt = Exit()
 
     music = load_music('music/over_bgm.mp3')
-    music.play()
+    music.set_volume(32)
+    music.repeat_play()
 
 def exit():
     global back_board, replay_bt, exit_bt, over_font
